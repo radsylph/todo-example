@@ -12,10 +12,12 @@ import netlify from '@netlify/vite-plugin-tanstack-start'
 const config = defineConfig({
   plugins: [
     devtools(),
-    paraglideVitePlugin({
+    paraglideVitePlugin({ // the config for the localization plugin
       project: './project.inlang',
       outdir: './src/paraglide',
-      strategy: ['url', 'baseLocale'],
+      outputStructure: "message-modules",
+      cookieName: "PARAGLIDE_LOCALE",
+      strategy: ["cookie", "preferredLanguage", "baseLocale"],
     }),
     netlify(),
     tsconfigPaths({ projects: ['./tsconfig.json'] }),
