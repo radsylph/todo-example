@@ -3,7 +3,6 @@ import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import { Button } from "../ui/button";
 import { ArrowLeft } from "lucide-react";
 
-
 interface Props {
   title?: string;
   description?: string;
@@ -22,7 +21,7 @@ export default function PageContainer({
   const canGoBack = useCanGoBack();
   const router = useRouter();
   return (
-    <div className={cn("max-w-7xl mx-auto p-4 pt-0", className)}>
+    <div className={cn("container  p-4 pt-0", className)}>
       <div className="mb-4 flex flex-col gap-2">
         <>
           {goBack && (
