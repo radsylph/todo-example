@@ -10,7 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppTodosAddRouteImport } from './routes/app/todos/add'
+import { Route as AppTaskIndexRouteImport } from './routes/app/task/index'
+import { Route as AppTaskAddRouteImport } from './routes/app/task/add'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -18,10 +19,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppTodosAddRoute = AppTodosAddRouteImport.update({
-  id: '/todos/add',
-  path: '/todos/add',
-  getParentRoute: () => AppRouteRoute,
+const AppTaskIndexRoute = AppTaskIndexRouteImport.update({
+  id: '/app/task/',
+  path: '/app/task/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppTaskAddRoute = AppTaskAddRouteImport.update({
+  id: '/app/task/add',
+  path: '/app/task/add',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -32,30 +38,35 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/app/todos/add': typeof AppTodosAddRoute
+  '/app/task/add': typeof AppTaskAddRoute
+  '/app/task/': typeof AppTaskIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/app/todos/add': typeof AppTodosAddRoute
+  '/app/task/add': typeof AppTaskAddRoute
+  '/app/task': typeof AppTaskIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/app/todos/add': typeof AppTodosAddRoute
+  '/app/task/add': typeof AppTaskAddRoute
+  '/app/task/': typeof AppTaskIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/auth/$' | '/app/todos/add'
+  fullPaths: '/' | '/api/auth/$' | '/app/task/add' | '/app/task/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/auth/$' | '/app/todos/add'
-  id: '__root__' | '/' | '/api/auth/$' | '/app/todos/add'
+  to: '/' | '/api/auth/$' | '/app/task/add' | '/app/task'
+  id: '__root__' | '/' | '/api/auth/$' | '/app/task/add' | '/app/task/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  AppTaskAddRoute: typeof AppTaskAddRoute
+  AppTaskIndexRoute: typeof AppTaskIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -67,12 +78,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/todos/add': {
-      id: '/app/todos/add'
-      path: '/todos/add'
-      fullPath: '/app/todos/add'
-      preLoaderRoute: typeof AppTodosAddRouteImport
-      parentRoute: typeof AppRouteRoute
+    '/app/task/': {
+      id: '/app/task/'
+      path: '/app/task'
+      fullPath: '/app/task/'
+      preLoaderRoute: typeof AppTaskIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/task/add': {
+      id: '/app/task/add'
+      path: '/app/task/add'
+      fullPath: '/app/task/add'
+      preLoaderRoute: typeof AppTaskAddRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -87,6 +105,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  AppTaskAddRoute: AppTaskAddRoute,
+  AppTaskIndexRoute: AppTaskIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
