@@ -11,7 +11,7 @@ interface Props {
   goBack?: boolean;
 }
 
-export default function PageContainer({
+export function PageContainer({
   title,
   description,
   children,
@@ -21,25 +21,25 @@ export default function PageContainer({
   const canGoBack = useCanGoBack();
   const router = useRouter();
   return (
-    <div className={cn("container  p-4 pt-0", className)}>
+    <div className={cn("container p-4", className)}>
       <div className="mb-4 flex flex-col gap-2">
         <>
           {goBack && (
             <Button
-              variant={"link"}
-              size={"sm"}
+              variant="outline"
+              size="sm"
               onClick={() =>
                 canGoBack ? router.history.back() : router.navigate({ to: "/" })
               }
-              className="flex items-center gap-2 w-fit"
+              className="flex items-center gap-2 w-fit rounded-xl"
             >
               <ArrowLeft className="size-4" />
-              go back
+              Return
             </Button>
           )}
         </>
-          {title && <h1 className="text-2xl font-bold">{title}</h1>}
-          {description && <p className="text-muted-foreground">{description}</p>}
+        {title && <h1 className="text-2xl font-bold">{title}</h1>}
+        {description && <p className="text-muted-foreground">{description}</p>}
       </div>
       {children}
     </div>

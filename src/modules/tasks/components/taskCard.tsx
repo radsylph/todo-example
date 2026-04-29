@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "#components/ui/card";
@@ -48,19 +47,13 @@ export function TaskCard({ task }: TaskCardProps) {
   };
 
   return (
-    <Card className="flex flex-col gap-2 p-4 rounded-xl bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between gap-2">
+    <Card className="flex flex-col gap-2 rounded-xl bg-card shadow-sm hover:shadow-lg hover:scale-101 cursor-pointer transition-all duration-500">
+      <CardHeader className="flex justify-between">
         <div className="flex items-center gap-2">
-          <Badge
-            variant="outline"
-            className={cn(statusColor[status])}
-          >
+          <Badge variant="outline" className={cn(statusColor[status])}>
             {statusLabel[status]}
           </Badge>
-          <Badge
-            variant="outline"
-            className={cn(priorityColor[priority])}
-          >
+          <Badge variant="outline" className={cn(priorityColor[priority])}>
             {priorityLabel[priority]}
           </Badge>
         </div>
@@ -69,22 +62,24 @@ export function TaskCard({ task }: TaskCardProps) {
             <Badge variant="outline">
               <RelativeTimeCard
                 date={createdAt}
-                className="text-accent-foreground"
+                className="hover:text-accent-foreground"
               />
             </Badge>
           </div>
         </div>
-      </div>
+      </CardHeader>
 
-      <CardTitle className="font-semibold text-lg line-clamp-1">
-        <h1>{task.title}</h1>
-      </CardTitle>
+      <CardContent>
+        <CardTitle className="font-semibold text-lg truncate">
+          <h1>{task.title}</h1>
+        </CardTitle>
 
-      {task.description && (
-        <CardDescription className="text-md text-muted-foreground line-clamp-4">
-          {task.description}
-        </CardDescription>
-      )}
+        {task.description && (
+          <CardDescription className="text-md text-muted-foreground line-clamp-4">
+            {task.description}
+          </CardDescription>
+        )}
+      </CardContent>
     </Card>
   );
 }

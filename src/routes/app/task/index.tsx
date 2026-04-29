@@ -1,11 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import PageContainer from "#components/layout/pageContainer";
+import { PageContainer } from "#components/layout/pageContainer.tsx";
 import { getTasksFn } from "#/modules/tasks/logic/functions";
 import { Badge } from "#components/ui/badge";
 import { Button } from "#/modules/common/components/ui/button";
-import { Plus, ListTodo, CheckCircle } from "lucide-react";
-import { TaskCard } from "#/modules/tasks/components/TaskCard";
+import { Plus } from "lucide-react";
+import { TaskCard } from "#modules/tasks/components/taskCard.tsx";
 import { m } from "#/paraglide/messages";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyDescription,
+  EmptyTitle,
+} from "#components/ui/empty.tsx";
 
 export const Route = createFileRoute("/app/task/")({
   component: RouteComponent,
@@ -18,17 +24,24 @@ function RouteComponent() {
   const totalTasks = tasks.length;
 
   return (
-    <PageContainer title={m.tasks_title()} description={m.tasks_description()} className="pt-8">
+    <PageContainer
+      title={m.tasks_title()}
+      description={m.tasks_description()}
+      className="pt-8"
+    >
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between bg-muted/50 p-4 rounded-2xl">
           <div className="flex items-center gap-4">
             <div className="flex flex-col gap-2 ">
               <h2 className="text-lg font-bold">
-                {m.completion_status()}
+                {/* {m.completion_status()} */}
               </h2>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-md font-bold">
-                  {m.tasks_count({ completed: completedTasks, total: totalTasks })}
+                  {m.tasks_count({
+                    completed: completedTasks,
+                    total: totalTasks,
+                  })}
                 </Badge>
                 <Badge
                   variant={
@@ -47,7 +60,7 @@ function RouteComponent() {
             </div>
           </div>
 
-          <Button asChild className="rounded-xl">
+          <Button variant="outline" asChild className="rounded-xl">
             <Link to="/app/task/add">
               <Plus className="mr-2" />
               {m.new_task()}
@@ -59,13 +72,15 @@ function RouteComponent() {
           {tasks.length > 0 ? (
             tasks.map((task) => <TaskCard key={task.id} task={task} />)
           ) : (
-            <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground gap-4 border-2 border-dashed rounded-3xl">
-              <ListTodo className="size-12 opacity-20" />
-              <p>{m.no_tasks_found()}</p>
+            <Empty className="col-span-full py-20 text-muted-foreground border-2 border-dashed rounded-3xl">
+              <EmptyHeader>
+                <EmptyTitle>{m.no_tasks_found()}</EmptyTitle>
+                <EmptyDescription>{m.create_first_task()}</EmptyDescription>
+              </EmptyHeader>
               <Button variant="outline" asChild>
                 <Link to="/app/task/add">{m.create_first_task()}</Link>
               </Button>
-            </div>
+            </Empty>
           )}
         </div>
       </div>

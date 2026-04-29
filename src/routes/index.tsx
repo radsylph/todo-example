@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import PageContainer from '#/modules/common/components/layout/pageContainer'
+import { PageContainer } from '#components/layout/pageContainer.tsx'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -8,7 +8,7 @@ export const Route = createFileRoute('/')({
 function App() {
   return (
     <PageContainer title="Home" description="This is the home page of the app">
-    
+
      test
     </PageContainer>
   )
