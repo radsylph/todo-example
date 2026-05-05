@@ -16,7 +16,6 @@ export const updateTaskSchema = createUpdateSchema(task, {
   title: (schema) => schema.min(1, "The title is obligatory"),
   description: (schema) => schema.optional(),
 }).omit({
-  id: true,
   createdAt: true,
   updatedAt: true,
   isDeleted: true,
