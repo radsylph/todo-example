@@ -4,6 +4,7 @@ import { useCanGoBack, useRouter, useBlocker } from "@tanstack/react-router";
 import { useFormContext } from "react-hook-form";
 import { ConfirmDialog } from "./confirmDialog";
 import { Button } from "#components/ui/button";
+import { m } from "#/paraglide/messages";
 
 interface FormProps {
   title?: string;
@@ -16,15 +17,16 @@ interface FormProps {
   cancelLabel?: string;
   isSubmitting?: boolean;
 }
-//mejorar el form layout  y hacer los demas componentes como se hizo en xprmedia
 
 export default function FormLayout({
   children,
   onSubmit,
-  submitLabel = "Save changes",
-  cancelLabel = "Cancel",
+  submitLabel,
+  cancelLabel,
   isSubmitting: isSubmittingProp,
 }: FormProps) {
+  const finalSubmitLabel = submitLabel ?? m.form_save_changes();
+  const finalCancelLabel = cancelLabel ?? m.form_cancel();
   const [openReset, setOpenReset] = useState(false);
   const router = useRouter();
   const form = useFormContext();
@@ -70,45 +72,58 @@ export default function FormLayout({
           {children}
         </div>
 
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl">
-          <div className="bg-background/60 backdrop-blur-xl border border-border/50 shadow-2xl rounded-2xl p-4 flex items-center justify-end gap-3 px-6 ring-1 ring-black/5 dark:ring-white/5">
-            <Button
-              variant="outline"
-              onClick={() => handleGoBack()}
-              disabled={isSubmitting}
-            >
-              {isDirty ? (
-                <X className="mr-2 size-4" />
-              ) : (
-                <ArrowLeft className="mr-2 size-4" />
-              )}
-              {isDirty ? "Reset Changes" : cancelLabel}
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting || (onSubmit && !isDirty)}
-              className="min-w-36 rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              {isSubmitting ? (
-                <Loader2 className="mr-2 size-4 animate-spin" />
-              ) : (
-                <Save className="mr-2 size-4" />
-              )}
-              {submitLabel}
-            </Button>
+        <div className="sticky bottom-6 self-center z-50 w-[calc(100%-2rem)] max-w-xl md:max-w-2xl lg:max-w-4xl">
+          <div className="bg-background/80 backdrop-blur-2xl border border-border/50 shadow-2xl rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 px-6 ring-1 ring-black/5 dark:ring-white/5">
+            <div className="hidden sm:flex flex-col">
+              <p className="text-sm font-medium text-foreground/80">
+                {isDirty ? m.form_unsaved_changes() : m.form_all_changes_saved()}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {isDirty
+                  ? m.form_remember_save()
+                  : m.form_safely_exit()}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto gap-3">
+              <Button
+              type="button"
+                variant={isDirty ? "destructive" : "outline"}
+                onClick={(e) => handleGoBack(e)}
+                disabled={isSubmitting}
+                className="w-full sm:w-auto order-2 sm:order-1"
+              >
+                {isDirty ? (
+                  <X className="mr-2 size-4" />
+                ) : (
+                  <ArrowLeft className="mr-2 size-4" />
+                )}
+                {isDirty ? m.form_reset_changes() : finalCancelLabel}
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting || (onSubmit && !isDirty)}
+                className="w-full sm:w-auto order-2 sm:order-1"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 size-4" />
+                )}
+                {finalSubmitLabel}
+              </Button>
+            </div>
           </div>
         </div>
       </form>
 
-      {/* <LeaveConfirmation shouldBlock={isDirty && !isSubmitting} /> */}
-
       <ConfirmDialog
-        title={"You have unsaved changes"}
+        title={m.form_confirm_leave_title()}
         icon={<TriangleAlert className="size-5 text-amber-500" />}
-        description={"Are you sure you want to leave? Your changes will be lost."}
+        description={m.form_confirm_leave_desc()}
         onConfirm={() => proceed?.()}
-        cancelBtnText={"Stay"}
-        confirmBtnText={"Leave"}
+        cancelBtnText={m.form_confirm_stay()}
+        confirmBtnText={m.form_confirm_leave()}
         open={status === "blocked"}
         onOpenChange={() => blockerReset?.()}
       />
@@ -116,51 +131,18 @@ export default function FormLayout({
       <ConfirmDialog
         open={openReset}
         onOpenChange={setOpenReset}
-        title="Reset changes?"
-        description="All your changes will be lost if you reset."
+        title={m.form_reset_title()}
+        icon={<TriangleAlert className="size-5 text-amber-500" />}
+        description={m.form_reset_desc()}
         onConfirm={() => {
-          formReset();
-          setOpenReset(false);
+          formReset()
+          setOpenReset(false)
         }}
         onCancel={() => setOpenReset(false)}
-        confirmBtnText="Reset Changes"
-        cancelBtnText="Keep Editing"
+        confirmBtnText={m.form_reset_changes()}
+        cancelBtnText={m.form_keep_editing()}
         isDestructive
       />
     </>
-  );
-}
-
-export interface LeaveProps {
-  shouldBlock: boolean;
-  title?: string;
-  message?: string;
-  leaveText?: string;
-  stayText?: string;
-}
-
-export function LeaveConfirmation({
-  shouldBlock,
-  title = "You have unsaved changes",
-  message = "Are you sure you want to leave? Your changes will be lost.",
-  leaveText = "Leave",
-  stayText = "Stay",
-}: LeaveProps) {
-  const { proceed, reset, status } = useBlocker({
-    shouldBlockFn: () => shouldBlock,
-    withResolver: true,
-  });
-
-  return (
-    <ConfirmDialog
-      title={title}
-      icon={<TriangleAlert className="size-5 text-amber-500" />}
-      description={message}
-      onConfirm={() => proceed?.()}
-      cancelBtnText={stayText}
-      confirmBtnText={leaveText}
-      open={status === "blocked"}
-      onOpenChange={() => reset?.()}
-    />
   );
 }

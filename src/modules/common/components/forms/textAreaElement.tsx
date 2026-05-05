@@ -11,13 +11,13 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { Input } from "#components/ui/input";
+import { Textarea } from "#components/ui/textarea";
 import { cn } from "../../../../lib/utils";
 
-interface InputElementProps<
+interface TextAreaElementProps<
   TFormValues extends FieldValues,
   TName extends FieldPath<TFormValues> = FieldPath<TFormValues>,
-> extends React.InputHTMLAttributes<HTMLInputElement> {
+> extends React.InputHTMLAttributes<HTMLTextAreaElement> {
   control: Control<TFormValues>;
   name: TName;
   label?: React.ReactNode;
@@ -25,18 +25,16 @@ interface InputElementProps<
   optional?: boolean;
   inputClassName?: string;
   labelClassName?: string;
-  renderRightAdornment?: (fieldValue: TFormValues[TName]) => React.ReactNode;
 }
 
-export function InputElement<
+export function TextAreaElement<
   TFormValues extends FieldValues,
   TName extends FieldPath<TFormValues>,
 >({
   control,
   name,
-  renderRightAdornment,
   ...props
-}: InputElementProps<TFormValues, TName>) {
+}: TextAreaElementProps<TFormValues, TName>) {
   return (
     <FormField
       control={control}
@@ -45,7 +43,7 @@ export function InputElement<
         <FormItem className={cn("", props.className)}>
           {props.label && (
             <FormLabel className={cn("", props.labelClassName)}>
-             <p className="text-base font-medium">{props.label}</p>
+              <p className="text-base font-medium">{props.label}</p>
               {props.required && (
                 <span className="text-red-500 font-bold">*</span>
               )}
@@ -55,19 +53,19 @@ export function InputElement<
             </FormLabel>
           )}
           <FormControl>
-            <Input
+            <Textarea
               {...field}
               value={field.value ?? ""}
               placeholder={props.placeholder}
               className={cn("text-base font-medium", props.inputClassName)}
-              type={props.type ?? "text"}
               disabled={props.disabled}
               autoComplete={props.autoComplete}
-              suffix={renderRightAdornment?.(field.value)}
             />
           </FormControl>
           {props.description && (
-            <FormDescription className="text-base">{props.description}</FormDescription>
+            <FormDescription className="text-base">
+              {props.description}
+            </FormDescription>
           )}
           <FormMessage />
         </FormItem>
