@@ -23,7 +23,7 @@ export const createTaskFn = createServerFn({method: "POST"}).inputValidator(crea
   return await createTask(data);
 })
 
-export const updateTaskFn = createServerFn({method: "GET"}).inputValidator(updateTaskSchema).handler(async ({data}) => {
+export const updateTaskFn = createServerFn({method: "POST"}).inputValidator(updateTaskSchema).handler(async ({data}) => {
   return await updateTask(data);
 })
 

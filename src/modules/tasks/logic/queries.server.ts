@@ -2,12 +2,11 @@ import { eq, and, desc } from "drizzle-orm"
 import { db } from "#/db"
 import { task } from "#/db/schema"
 
-export type NewTask = typeof task.$inferInsert
-export type TaskUpdate = Partial<Omit<NewTask, | "createdAt">>
+import type { Task, TaskInsert, TaskUpdate } from "../types"
 
 // main functions
 
-export const getTasks = async (): Promise<NewTask[]> => {
+export const getTasks = async (): Promise<Task[]> => {
   return await db
     .select()
     .from(task)
@@ -15,7 +14,7 @@ export const getTasks = async (): Promise<NewTask[]> => {
     .orderBy(desc(task.createdAt))
 }
 
-export const getTaskById = async (id: string): Promise<NewTask | null> => {
+export const getTaskById = async (id: string): Promise<Task | null> => {
   const result = await db
     .select()
     .from(task)
@@ -25,7 +24,7 @@ export const getTaskById = async (id: string): Promise<NewTask | null> => {
   return result[0] ?? null
 }
 
-export const createTask = async (data: NewTask): Promise<NewTask> => {
+export const createTask = async (data: TaskInsert): Promise<Task> => {
   const result = await db
     .insert(task)
     .values(data)
@@ -34,7 +33,7 @@ export const createTask = async (data: NewTask): Promise<NewTask> => {
   return result[0]
 }
 
-export const updateTask = async (data: TaskUpdate): Promise<NewTask> => {
+export const updateTask = async (data: TaskUpdate): Promise<Task> => {
 
   const {id, ...updateData} = data
 
