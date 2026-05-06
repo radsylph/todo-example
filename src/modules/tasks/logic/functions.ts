@@ -6,12 +6,12 @@ import {
   getTaskById,
   deleteTask,
 } from "./queries.server";
-import { createTaskSchema, updateTaskSchema, selectTaskSchema } from "../schemas";
+import {createTaskSchema, updateTaskSchema, selectTaskSchema, taskQueryOptionsSchema, taskPaginationResponseSchema} from "../schemas";
 import {z} from "zod";
 
-export const getTasksFn = createServerFn({method: "GET"}).handler(async () => {
-  const response = await getTasks();
-  return selectTaskSchema.array().parse(response);
+export const getTasksFn = createServerFn({method: "GET"}).inputValidator(taskQueryOptionsSchema).handler(async ({data}) => {
+  const response = await getTasks(data);
+  return taskPaginationResponseSchema.parse(response);
 })
 
 export const getTaskByIdFn = createServerFn({method: "GET"}).inputValidator(z.object({taskId: z.string()})).handler(async ({data}) => {
