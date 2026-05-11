@@ -5,6 +5,7 @@ export const baseQueryOptionsSchema = z.object({
     page: z.number().int().positive().default(1),
     limit: z.number().int().positive().default(10),
     orderBy: z.enum(["asc", "desc"]).default("desc"),
+    sortBy: z.any().optional(),
 });
 
 export type baseQueryOptions = z.infer<typeof baseQueryOptionsSchema>;

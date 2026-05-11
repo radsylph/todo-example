@@ -4,23 +4,27 @@ import { getTasksFn } from "#/modules/tasks/logic/functions";
 import { Badge } from "#components/ui/badge";
 import { Button } from "#/modules/common/components/ui/button";
 import { Plus } from "lucide-react";
-import { TaskCard } from "#modules/tasks/components/taskCard.tsx";
+import type { Task } from "#modules/tasks/types";
+import { TaskDataTable } from "#modules/tasks/components/table/taskDataTable.tsx";
 import { m } from "#/paraglide/messages";
-import {
-  Empty,
-  EmptyHeader,
-  EmptyDescription,
-  EmptyTitle,
-} from "#components/ui/empty.tsx";
+
+import { taskQueryOptionsSchema } from "#modules/tasks/schemas.ts";
 
 export const Route = createFileRoute("/app/task/")({
+  validateSearch: (search: Record<string, unknown>) => {
+    return taskQueryOptionsSchema.parse({
+      ...search,
+    });
+  },
+  loaderDeps: ({ search }) => search,
   component: RouteComponent,
-  loader: () => getTasksFn(),
+  loader: ({ deps }) => getTasksFn({ data: deps }),
 });
 
 function RouteComponent() {
-  const tasks = Route.useLoaderData();
-  const completedTasks = tasks.filter((t) => t.status === "completed").length;
+  const response = Route.useLoaderData();
+  const tasks = response.data
+  const completedTasks = tasks.filter((t: Task) => t.status === "completed").length;
   const totalTasks = tasks.length;
 
   return (
@@ -30,12 +34,12 @@ function RouteComponent() {
       className="pt-8"
     >
       <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between bg-muted/50 p-4 rounded-2xl">
+        <div className="flex items-center justify-between rounded-2xl">
           <div className="flex items-center gap-4">
             <div className="flex flex-col gap-2 ">
-              <h2 className="text-lg font-bold">
-                {/* {m.completion_status()} */}
-              </h2>
+              {/* <h2 className="text-lg font-bold"> */}
+              {/* {m.completion_status()} */}
+              {/* </h2> */}
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-md font-bold">
                   {m.tasks_count({
@@ -68,20 +72,8 @@ function RouteComponent() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tasks.length > 0 ? (
-            tasks.map((task) => <TaskCard key={task.id} task={task} />)
-          ) : (
-            <Empty className="col-span-full py-20 text-muted-foreground border-2 border-dashed rounded-3xl">
-              <EmptyHeader>
-                <EmptyTitle>{m.no_tasks_found()}</EmptyTitle>
-                <EmptyDescription>{m.create_first_task()}</EmptyDescription>
-              </EmptyHeader>
-              <Button variant="outline" asChild>
-                <Link to="/app/task/add">{m.create_first_task()}</Link>
-              </Button>
-            </Empty>
-          )}
+        <div className="mt-6">
+          <TaskDataTable data={response} />
         </div>
       </div>
     </PageContainer>

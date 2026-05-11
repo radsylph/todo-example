@@ -32,6 +32,8 @@ export const taskQueryOptionsSchema = baseQueryOptionsSchema.extend({
   priority: z.enum(TaskPriority).optional(),
 });
 
+export type taskQueryOptions = z.infer<typeof taskQueryOptionsSchema>;
+
 export const taskPaginationResponseSchema = basePaginationResponseSchema.extend({
   data: z.array(selectTaskSchema),
 });

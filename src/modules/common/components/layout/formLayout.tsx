@@ -57,7 +57,7 @@ export default function FormLayout({
   };
 
   const executeGoBack = () => {
-    canGoBack ? router.history.back() : router.navigate({ to: "/app/task" });
+    canGoBack ? router.history.back() : router.navigate({ to: "/app/task", search: { page: 1, limit: 10, orderBy: "desc" } });
   };
 
   return (

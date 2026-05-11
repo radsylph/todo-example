@@ -6,7 +6,7 @@ import type { Task, TaskInsert, TaskUpdate,TaskQueryOptions, TaskPaginationRespo
 // main functions
 
 export const getTasks = async (options: TaskQueryOptions): Promise<TaskPaginationResponse> => {
-  const { search, page = 1, limit = 10, orderBy = "desc", priority, status } = options
+  const { search, page = 1, limit = 10, orderBy = "desc", priority, status, sortBy } = options
 
   const whereConditions = [eq(task.isDeleted, false)];
 
@@ -22,13 +22,26 @@ export const getTasks = async (options: TaskQueryOptions): Promise<TaskPaginatio
     whereConditions.push(eq(task.status, status))
   }
 
+
+  const sortMapping = {
+    title: task.title,
+    status: task.status,
+    priority: task.priority,
+    createdAt: task.createdAt,
+    updatedAt: task.updatedAt,
+  } as const;
+
+  const sortColumn = (sortBy && sortBy in sortMapping) 
+    ? sortMapping[sortBy as keyof typeof sortMapping] 
+    : task.createdAt;
+
   const result = await db
     .select()
     .from(task)
     .where(and(...whereConditions))
     .limit(limit)
     .offset((page - 1) * limit)
-    .orderBy(orderBy === "desc" ? desc(task.createdAt) : asc(task.createdAt))
+    .orderBy(orderBy === "asc" ? asc(sortColumn) : desc(sortColumn))
 
   const total = await db.$count(task)
 

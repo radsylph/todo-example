@@ -65,13 +65,13 @@ export function TaskForm({ type, task }: props) {
       const result = await createTaskFn({ data: task });
       toast.success(m.task_created_success(), result);
       setLoading(false);
-      router.navigate({ to: "/app/task" });
+      router.navigate({ to: "/app/task", search: { page: 1, limit: 10, orderBy: "desc" } });
     } else {
       setLoading(true);
       const result = await updateTaskFn({ data: task });
       toast.success(m.task_updated_success(), result);
       setLoading(false);
-      router.navigate({ to: "/app/task" });
+      router.navigate({ to: "/app/task", search: { page: 1, limit: 10, orderBy: "desc" } });
     }
   };
 
