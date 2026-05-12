@@ -91,9 +91,9 @@ export function TaskCard({ task }: TaskCardProps) {
         <CardHeader className="flex p-0 flex-wrap w-full justify-between items-center bg-transparent">
           <div className="flex gap-2">
             <Badge
-              variant="secondary"
+              variant="outline"
               className={cn(
-                "text-xs uppercase tracking-wider font-bold",
+                "text-xs uppercase tracking-wider font-semibold",
                 taskStatus[status].badge,
               )}
             >

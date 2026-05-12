@@ -1,27 +1,44 @@
-import { eq, and, desc, asc, ilike } from "drizzle-orm"
-import { db } from "#/db"
-import { task } from "#/db/schema"
-import type { Task, TaskInsert, TaskUpdate,TaskQueryOptions, TaskPaginationResponse } from "../types"
+import { eq, and, desc, asc, ilike } from "drizzle-orm";
+import { db } from "#/db";
+import { task } from "#/db/schema";
+import type {
+  Task,
+  TaskInsert,
+  TaskUpdate,
+  TaskQueryOptions,
+  TaskPaginationResponse,
+} from "../types";
 
 // main functions
 
-export const getTasks = async (options: TaskQueryOptions): Promise<TaskPaginationResponse> => {
-  const { search, page = 1, limit = 10, orderBy = "desc", priority, status, sortBy } = options
+const baseWhereCondition = [eq(task.isDeleted, false)];
 
-  const whereConditions = [eq(task.isDeleted, false)];
+export const getTasks = async (
+  options: TaskQueryOptions,
+): Promise<TaskPaginationResponse> => {
+  const {
+    search,
+    page = 1,
+    limit = 10,
+    orderBy = "desc",
+    priority,
+    status,
+    sortBy,
+  } = options;
+
+  const whereConditions = [...baseWhereCondition];
 
   if (search) {
-    whereConditions.push(ilike(task.title, `%${search}%`))
+    whereConditions.push(ilike(task.title, `%${search}%`));
   }
 
   if (priority) {
-    whereConditions.push(eq(task.priority, priority))
+    whereConditions.push(eq(task.priority, priority));
   }
 
   if (status) {
-    whereConditions.push(eq(task.status, status))
+    whereConditions.push(eq(task.status, status));
   }
-
 
   const sortMapping = {
     title: task.title,
@@ -31,9 +48,10 @@ export const getTasks = async (options: TaskQueryOptions): Promise<TaskPaginatio
     updatedAt: task.updatedAt,
   } as const;
 
-  const sortColumn = (sortBy && sortBy in sortMapping) 
-    ? sortMapping[sortBy as keyof typeof sortMapping] 
-    : task.createdAt;
+  const sortColumn =
+    sortBy && sortBy in sortMapping
+      ? sortMapping[sortBy as keyof typeof sortMapping]
+      : task.createdAt;
 
   const result = await db
     .select()
@@ -41,80 +59,76 @@ export const getTasks = async (options: TaskQueryOptions): Promise<TaskPaginatio
     .where(and(...whereConditions))
     .limit(limit)
     .offset((page - 1) * limit)
-    .orderBy(orderBy === "asc" ? asc(sortColumn) : desc(sortColumn))
+    .orderBy(orderBy === "asc" ? asc(sortColumn) : desc(sortColumn));
 
-  const total = await db.$count(task)
+  const total = await db.$count(task);
 
-    return {
-      data: result.map(mapResponseToTask),
-      totalItems: Number(total),
-      page,
-      limit,
-      totalPages: Math.ceil(Number(total) / limit),
-    }
-
-}
+  return {
+    data: result.map(mapResponseToTask),
+    totalItems: Number(total),
+    page,
+    limit,
+    totalPages: Math.ceil(Number(total) / limit),
+  };
+};
 
 export const getTaskById = async (id: string): Promise<Task | null> => {
+  const whereConditions = [...baseWhereCondition];
+  whereConditions.push(eq(task.id, id));
   const result = await db
     .select()
     .from(task)
-    .where(and(eq(task.id, id), eq(task.isDeleted, false)))
-    .limit(1)
-  
-  return result[0] ?? null
-}
+    .where(and(...whereConditions))
+    .limit(1);
+
+  return result[0] ?? null;
+};
 
 export const createTask = async (data: TaskInsert): Promise<Task> => {
-  const result = await db
-    .insert(task)
-    .values(data)
-    .returning()
-  
-  return result[0]
-}
+  const result = await db.insert(task).values(data).returning();
+
+  return result[0];
+};
 
 export const updateTask = async (data: TaskUpdate): Promise<Task> => {
-
-  const {id, ...updateData} = data
+  const { id, ...updateData } = data;
 
   if (!id) {
-    throw new Error("Task id is required")
+    throw new Error("Task id is required");
   }
 
-  await checkTaskExists(id)
+  await checkTaskExists(id);
 
   const result = await db
     .update(task)
     .set({ ...updateData, updatedAt: new Date() })
     .where(eq(task.id, id))
-    .returning()
-  
-  return result[0]
-}
+    .returning();
+
+  return result[0];
+};
 
 export const deleteTask = async (id: string): Promise<void> => {
-  await checkTaskExists(id)
+  await checkTaskExists(id);
 
   await db
     .update(task)
     .set({
       isDeleted: true,
-      deletedAt: new Date()
+      deletedAt: new Date(),
     })
-    .where(eq(task.id, id))
-
-}
+    .where(eq(task.id, id));
+};
 
 // helper functions
 
 const checkTaskExists = async (id: string) => {
-  const existingTask = await getTaskById(id)
+  const existingTask = await getTaskById(id);
 
   if (!existingTask) {
-    throw new Error("Task not found")
+    throw new Error("Task not found");
   }
-}
+};
 
 const mapResponseToTask = (task: Task): Task => {
   return {
@@ -126,6 +140,6 @@ const mapResponseToTask = (task: Task): Task => {
     createdAt: task.createdAt,
     updatedAt: task.updatedAt,
     isDeleted: task.isDeleted,
-    deletedAt: task.deletedAt
-  }
-}
+    deletedAt: task.deletedAt,
+  };
+};

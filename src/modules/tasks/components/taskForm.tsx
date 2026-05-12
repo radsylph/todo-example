@@ -62,14 +62,14 @@ export function TaskForm({ type, task }: props) {
   const onSubmit = async (task: TaskInsert) => {
     if (type === "create") {
       setLoading(true);
-      const result = await createTaskFn({ data: task });
-      toast.success(m.task_created_success(), result);
+      await createTaskFn({ data: task });
+      toast.success(m.task_created_success());
       setLoading(false);
       router.navigate({ to: "/app/task", search: { page: 1, limit: 10, orderBy: "desc" } });
     } else {
       setLoading(true);
-      const result = await updateTaskFn({ data: task });
-      toast.success(m.task_updated_success(), result);
+      await updateTaskFn({ data: task });
+      toast.success(m.task_updated_success());
       setLoading(false);
       router.navigate({ to: "/app/task", search: { page: 1, limit: 10, orderBy: "desc" } });
     }
