@@ -46,11 +46,15 @@ export function TaskForm({ type, task }: props) {
   const [loading, setLoading] = useState(false);
 
   const form = useForm({
-    resolver: zodResolver(type === "create" ? createTaskSchema : updateTaskSchema),
-    values: task ? {
-      ...task,
-      description: task.description ?? "",
-    } : undefined,
+    resolver: zodResolver(
+      type === "create" ? createTaskSchema : updateTaskSchema,
+    ),
+    values: task
+      ? {
+          ...task,
+          description: task.description ?? "",
+        }
+      : undefined,
     defaultValues: {
       title: "",
       description: "",
@@ -65,13 +69,19 @@ export function TaskForm({ type, task }: props) {
       await createTaskFn({ data: task });
       toast.success(m.task_created_success());
       setLoading(false);
-      router.navigate({ to: "/app/task", search: { page: 1, limit: 10, orderBy: "desc" } });
+      router.navigate({
+        to: "/app/task",
+        search: { page: 1, limit: 10, orderBy: "desc" },
+      });
     } else {
       setLoading(true);
       await updateTaskFn({ data: task });
       toast.success(m.task_updated_success());
       setLoading(false);
-      router.navigate({ to: "/app/task", search: { page: 1, limit: 10, orderBy: "desc" } });
+      router.navigate({
+        to: "/app/task",
+        search: { page: 1, limit: 10, orderBy: "desc" },
+      });
     }
   };
 
