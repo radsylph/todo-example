@@ -346,7 +346,6 @@ a {
   }
 }
 
-
 @utility container {
   @apply max-w-7xl;
   margin-inline: auto;
