@@ -7,6 +7,11 @@ import { getLocale } from '#/paraglide/runtime'
 
 import appCss from '../styles.css?url'
 import { Toaster } from '#components/ui/sonner'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '#components/ui/sidebar'
+import { AppSideBar } from '#components/layout/sideBar/appSideBar'
+import { Separator } from '#components/ui/separator'
+
+import { ThemeProvider } from 'next-themes'
 
 // const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
 // hacer otra implementación con zustand para el manejo de los temas.
@@ -51,7 +56,21 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <SidebarProvider>
+            <AppSideBar />
+            <SidebarInset className="flex flex-col h-svh">
+              <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4 md:hidden">
+                <SidebarTrigger />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                <div className="font-bold">TanStack Todo</div>
+              </header>
+              <main className="flex-1 overflow-y-auto">
+                {children}
+              </main>
+            </SidebarInset>
+          </SidebarProvider>
+        </ThemeProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',
