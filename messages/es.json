@@ -4,6 +4,7 @@
   "nav_home": "Inicio",
   "nav_about": "Acerca de",
   "nav_docs": "Docs",
+  "nav_settings": "Configuración",
   "sr_follow_x": "Seguir a TanStack en X",
   "sr_go_github": "Ir al GitHub de TanStack",
   "footer_copyright": "Tu nombre aquí. Todos los derechos reservados.",
@@ -106,5 +107,10 @@
   "data_table_not_available": "N/D",
   "data_table_selected": "seleccionado(s)",
   "task_empty_title": "No se encontraron tareas",
-  "task_empty_description": "Crea una tarea para empezar y gestionar tu trabajo de forma eficiente."
+  "task_empty_description": "Crea una tarea para empezar y gestionar tu trabajo de forma eficiente.",
+  "sider_bar_title": "Menu principal",
+  "theme_toggle": "Cambiar tema",
+  "theme_light": "Claro",
+  "theme_dark": "Oscuro",
+  "theme_system": "Sistema"
 }
