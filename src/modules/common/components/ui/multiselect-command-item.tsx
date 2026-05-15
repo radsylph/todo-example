@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react';
 import { CommandItem } from '#modules/common/components/ui/command';
 import { cn } from '#/lib/utils';
-import type { Option } from '#modules/common/components/layout/DataTable/types';
+import type { Option } from '#modules/common/components/layout/dataTable/types';
 
 export interface MultiselectCommandItemProps {
   option: Option;

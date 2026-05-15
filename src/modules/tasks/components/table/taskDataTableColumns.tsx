@@ -1,10 +1,9 @@
-import DataTableBadgeCell from '#components/layout/DataTable/dataTableBadgeCell';
-import DataTableTextCell from '#components/layout/DataTable/dataTableTextCell';
+import DataTableBadgeCell from '#components/layout/dataTable/dataTableBadgeCell';
+import DataTableTextCell from '#components/layout/dataTable/dataTableTextCell';
 import { m } from '#/paraglide/messages';
-import { DataTableColumnHeader } from '#components/layout/DataTable/dataTableColumnHeader';
+import { DataTableColumnHeader } from '#components/layout/dataTable/dataTableColumnHeader';
 import { type ColumnDef } from '@tanstack/react-table';
 import { type Task, TaskStatus, TaskPriority } from '../../types';
-import {Search} from "lucide-react"
 export const taskColumns: ColumnDef<Task>[] = [
   {
     id:"title",

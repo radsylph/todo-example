@@ -1,11 +1,11 @@
 import type { TaskPaginationResponse } from "../../types";
-import { useDataTable } from "#components/layout/DataTable/useDataTable";
+import { useDataTable } from "#components/layout/dataTable/useDataTable";
 import { taskColumns } from "./taskDataTableColumns";
 import { useTaskFilters } from "#modules/tasks/hooks/useTaskFilters.ts";
 import { useState, useEffect, useCallback } from "react";
 import { useDebouncedCallback } from "#modules/common/hooks/useDebouncedCallback.ts";
-import { DataTableToolbar } from "#components/layout/DataTable/dataTableToolbar.tsx";
-import { DataTablePagination } from "#components/layout/DataTable/dataTablePagination.tsx";
+import { DataTableToolbar } from "#components/layout/dataTable/dataTableToolbar.tsx";
+import { DataTablePagination } from "#components/layout/dataTable/dataTablePagination.tsx";
 import { m } from "#/paraglide/messages";
 import { TaskCard } from "../taskCard";
 import {
@@ -83,7 +83,7 @@ export function TaskDataTable({ data }: TaskDataTableProps) {
       />
 
        {table.getRowModel().rows.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
           {table.getRowModel().rows.map((row) => (
             <TaskCard key={row.id} task={row.original} />
           ))}

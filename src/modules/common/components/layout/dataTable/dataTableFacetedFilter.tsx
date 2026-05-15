@@ -9,7 +9,7 @@ import { Separator } from '#components/ui/separator';
 import { MobileResponsivePanel } from '#components/ui/mobile-responsive-panel';
 import { CommandPanel } from '#components/ui/command-panel';
 import { MultiselectCommandItem } from '#components/ui/multiselect-command-item';
-import type { Option } from '#modules/common/components/layout/DataTable/types';
+import type { Option } from '#modules/common/components/layout/dataTable/types';
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;

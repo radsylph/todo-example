@@ -8,7 +8,7 @@ import {
   CommandList,
   CommandSeparator,
 } from '#modules/common/components/ui/command';
-import type { Option } from '#modules/common/components/layout/DataTable/types';
+import type { Option } from '#modules/common/components/layout/dataTable/types';
 import { Button } from '#modules/common/components/ui/button';
 
 export interface CommandPanelProps {
@@ -92,7 +92,7 @@ export function CommandPanel({
         return acc;
       }, {} as Record<string, typeof options>);
 
-      return Object.entries(groupedOptions).map(([groupKey, groupOptions]) => (
+      return Object.entries(groupedOptions).map(([groupKey, groupOptions]: [string, Option[]]) => (
         <CommandGroup
           key={groupKey}
           heading={groupOptions[0]?.groupLabel || groupKey}
