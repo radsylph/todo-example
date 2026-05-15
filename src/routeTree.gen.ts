@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppTaskIndexRouteImport } from './routes/app/task/index'
+import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/index'
 import { Route as AppTaskAddRouteImport } from './routes/app/task/add'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AppTaskEditTaskIdRouteImport } from './routes/app/task/edit.$taskId'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppTaskIndexRoute = AppTaskIndexRouteImport.update({
   id: '/app/task/',
   path: '/app/task/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppSettingsIndexRoute = AppSettingsIndexRouteImport.update({
+  id: '/app/settings/',
+  path: '/app/settings/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppTaskAddRoute = AppTaskAddRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/app/task/add': typeof AppTaskAddRoute
+  '/app/settings/': typeof AppSettingsIndexRoute
   '/app/task/': typeof AppTaskIndexRoute
   '/app/task/edit/$taskId': typeof AppTaskEditTaskIdRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/app/task/add': typeof AppTaskAddRoute
+  '/app/settings': typeof AppSettingsIndexRoute
   '/app/task': typeof AppTaskIndexRoute
   '/app/task/edit/$taskId': typeof AppTaskEditTaskIdRoute
 }
@@ -60,6 +68,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/app/task/add': typeof AppTaskAddRoute
+  '/app/settings/': typeof AppSettingsIndexRoute
   '/app/task/': typeof AppTaskIndexRoute
   '/app/task/edit/$taskId': typeof AppTaskEditTaskIdRoute
 }
@@ -69,6 +78,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api/auth/$'
     | '/app/task/add'
+    | '/app/settings/'
     | '/app/task/'
     | '/app/task/edit/$taskId'
   fileRoutesByTo: FileRoutesByTo
@@ -76,6 +86,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api/auth/$'
     | '/app/task/add'
+    | '/app/settings'
     | '/app/task'
     | '/app/task/edit/$taskId'
   id:
@@ -83,6 +94,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api/auth/$'
     | '/app/task/add'
+    | '/app/settings/'
     | '/app/task/'
     | '/app/task/edit/$taskId'
   fileRoutesById: FileRoutesById
@@ -91,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   AppTaskAddRoute: typeof AppTaskAddRoute
+  AppSettingsIndexRoute: typeof AppSettingsIndexRoute
   AppTaskIndexRoute: typeof AppTaskIndexRoute
   AppTaskEditTaskIdRoute: typeof AppTaskEditTaskIdRoute
 }
@@ -109,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/app/task'
       fullPath: '/app/task/'
       preLoaderRoute: typeof AppTaskIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/settings/': {
+      id: '/app/settings/'
+      path: '/app/settings'
+      fullPath: '/app/settings/'
+      preLoaderRoute: typeof AppSettingsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/task/add': {
@@ -139,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   AppTaskAddRoute: AppTaskAddRoute,
+  AppSettingsIndexRoute: AppSettingsIndexRoute,
   AppTaskIndexRoute: AppTaskIndexRoute,
   AppTaskEditTaskIdRoute: AppTaskEditTaskIdRoute,
 }
