@@ -25,18 +25,18 @@ export function TaskCard({ task }: TaskCardProps) {
   const taskPriority = {
     [TaskPriority.LOW]: {
       badge:
-        "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
+        "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
       dot: "bg-emerald-500",
       label: m.priority_low(),
     },
     [TaskPriority.MEDIUM]: {
       badge:
-        "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+        "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
       dot: "bg-amber-500",
       label: m.priority_medium(),
     },
     [TaskPriority.HIGH]: {
-      badge: "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200",
+      badge: "bg-rose-100 text-rose-800 dark:bg-rose-500/15 dark:text-rose-300",
       dot: "bg-rose-500",
       label: m.priority_high(),
     },
@@ -44,27 +44,27 @@ export function TaskCard({ task }: TaskCardProps) {
 
   const taskStatus = {
     [TaskStatus.ACTIVE]: {
-      badge: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+      badge: "bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300",
       label: m.status_active(),
     },
     [TaskStatus.INACTIVE]: {
-      badge: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
+      badge: "bg-gray-100 text-gray-800 dark:bg-gray-500/15 dark:text-gray-300",
       label: m.status_inactive(),
     },
     [TaskStatus.COMPLETED]: {
       badge:
-        "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+        "bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300",
       label: m.status_completed(),
     },
   };
 
   const stickyColors = {
     [TaskPriority.LOW]:
-      "bg-blue-50 dark:bg-blue-950/40 border-blue-100 dark:border-blue-900",
+      "bg-blue-50 dark:bg-blue-950/15 border-blue-100 dark:border-blue-900/30",
     [TaskPriority.MEDIUM]:
-      "bg-amber-50 dark:bg-amber-950/40 border-amber-100 dark:border-amber-900",
+      "bg-amber-50 dark:bg-amber-950/15 border-amber-100 dark:border-amber-900/30",
     [TaskPriority.HIGH]:
-      "bg-rose-50 dark:bg-rose-950/40 border-rose-100 dark:border-rose-900",
+      "bg-rose-50 dark:bg-rose-950/15 border-rose-100 dark:border-rose-900/30",
   };
 
 
@@ -78,13 +78,13 @@ export function TaskCard({ task }: TaskCardProps) {
       to="/app/task/edit/$taskId"
       params={{ taskId: task.id }}
       className={cn(
-        "block transition-all duration-500 hover:scale-105",
+        "block transition-[transform] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.03] hover:-translate-y-1 active:scale-95 will-change-transform",
         hoverRotation,
       )}
     >
       <Card
         className={cn(
-          "flex flex-col gap-2 p-5 min-h-50 border-none shadow-md hover:shadow-2xl transition-all duration-500 rounded-sm relative overflow-hidden",
+          "flex flex-col gap-2 p-5 min-h-50 border-none shadow-md hover:shadow-xl transition-shadow duration-500 ease-out rounded-sm relative overflow-hidden h-full",
           stickyColors[priority],
         )}
       >
@@ -111,7 +111,7 @@ export function TaskCard({ task }: TaskCardProps) {
           </CardTitle>
 
           {task.description && (
-            <CardDescription className="text-sm italic text-foreground/70 line-clamp-4 leading-relaxed">
+            <CardDescription className="text-sm italic text-foreground/50 dark:text-foreground/60 line-clamp-4 leading-relaxed">
               {task.description}
             </CardDescription>
           )}
