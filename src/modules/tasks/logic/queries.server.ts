@@ -8,6 +8,7 @@ import type {
   TaskQueryOptions,
   TaskPaginationResponse,
 } from "../types";
+import { handleDatabaseError } from "#/db/errorHandling";
 
 // main functions
 
@@ -53,44 +54,63 @@ export const getTasks = async (
       ? sortMapping[sortBy as keyof typeof sortMapping]
       : task.createdAt;
 
-  const result = await db
-    .select()
-    .from(task)
-    .where(and(...whereConditions))
-    .limit(limit)
-    .offset((page - 1) * limit)
-    .orderBy(orderBy === "asc" ? asc(sortColumn) : desc(sortColumn));
+  try {
+    const result = await db
+      .select()
+      .from(task)
+      .where(and(...whereConditions))
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .orderBy(orderBy === "asc" ? asc(sortColumn) : desc(sortColumn));
 
-  const total = await db.$count(task);
+    const total = await db.$count(task);
 
-  return {
-    data: result.map(mapResponseToTask),
-    totalItems: Number(total),
-    page,
-    limit,
-    totalPages: Math.ceil(Number(total) / limit),
-  };
+    return {
+      data: result.map(mapResponseToTask),
+      totalItems: Number(total),
+      page,
+      limit,
+      totalPages: Math.ceil(Number(total) / limit),
+    };
+  } catch (error) {
+    handleDatabaseError(error);
+    return {
+      data: [],
+      totalItems: 0,
+      page,
+      limit,
+      totalPages: 0,
+    };
+  }
 };
 
 export const getTaskById = async (id: string): Promise<Task | null> => {
   const whereConditions = [...baseWhereCondition];
   whereConditions.push(eq(task.id, id));
-  const result = await db
-    .select()
-    .from(task)
-    .where(and(...whereConditions))
-    .limit(1);
-
-  return result[0] ?? null;
+  try {
+    const result = await db
+      .select()
+      .from(task)
+      .where(and(...whereConditions))
+      .limit(1);
+    return result[0];
+  } catch (error) {
+    handleDatabaseError(error);
+    return null;
+  }
 };
 
-export const createTask = async (data: TaskInsert): Promise<Task> => {
-  const result = await db.insert(task).values(data).returning();
-
-  return result[0];
+export const createTask = async (data: TaskInsert): Promise<Task | null> => {
+  try {
+    const result = await db.insert(task).values(data).returning();
+    return result[0];
+  } catch (error) {
+    handleDatabaseError(error);
+    return null;
+  }
 };
 
-export const updateTask = async (data: TaskUpdate): Promise<Task> => {
+export const updateTask = async (data: TaskUpdate): Promise<Task | null> => {
   const { id, ...updateData } = data;
 
   if (!id) {
@@ -99,25 +119,34 @@ export const updateTask = async (data: TaskUpdate): Promise<Task> => {
 
   await checkTaskExists(id);
 
-  const result = await db
-    .update(task)
-    .set({ ...updateData, updatedAt: new Date() })
-    .where(eq(task.id, id))
-    .returning();
+  try {
+    const result = await db
+      .update(task)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(task.id, id))
+      .returning();
 
-  return result[0];
+    return result[0];
+  } catch (error) {
+    handleDatabaseError(error);
+    return null;
+  }
 };
 
 export const deleteTask = async (id: string): Promise<void> => {
   await checkTaskExists(id);
 
-  await db
-    .update(task)
-    .set({
-      isDeleted: true,
-      deletedAt: new Date(),
-    })
-    .where(eq(task.id, id));
+  try {
+    await db
+      .update(task)
+      .set({
+        isDeleted: true,
+        deletedAt: new Date(),
+      })
+      .where(eq(task.id, id));
+  } catch (error) {
+    handleDatabaseError(error);
+  }
 };
 
 // helper functions
