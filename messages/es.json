@@ -112,5 +112,19 @@
   "theme_toggle": "Cambiar tema",
   "theme_light": "Claro",
   "theme_dark": "Oscuro",
-  "theme_system": "Sistema"
+  "theme_system": "Sistema",
+  "language_english":"Ingles",
+  "language_spanish":"Español",
+  "mark_completed":"Marcar como completada",
+  "mark_active":"Marcar como activa",
+  "delete":"Eliminar",
+  "task_deleted_success":"Tarea eliminada con éxito",
+  "dialog_delete_title": "Eliminar tarea",
+  "dialog_delete_description": "¿Estás seguro de que quieres eliminar la tarea {taskTitle}? Esta acción no se puede deshacer.",
+  "dialog_update_status_title": "Cambiar estado",
+  "dialog_update_status_description": "¿Estás seguro de que quieres cambiar el estado de la tarea {taskTitle}? a {newStatus}",
+  "actions_label": "Acciones",
+  "dialog_delete": "Eliminar",
+  "dialog_update_status": "Cambiar estado",
+  "dialog_cancel":"Cancelar"
 }
