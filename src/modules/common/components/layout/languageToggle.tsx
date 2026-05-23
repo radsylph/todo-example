@@ -18,17 +18,17 @@ export function LanguageToggle() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="w-full justify-start gap-2 px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
           <Languages className="size-4" />
-          <span className="group-data-[collapsible=icon]:hidden">{m.language_label()}</span>
+          <p className="group-data-[collapsible=icon]:hidden">{m.language_label()}</p>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {(locales as unknown as string[]).map((locale) => (
+        {(locales).map((locale) => (
           <DropdownMenuItem 
             key={locale} 
-            onClick={() => setLocale(locale as any)}
+            onClick={() => setLocale(locale)}
             className={currentLocale === locale ? "bg-accent font-medium text-accent-foreground" : ""}
           >
-            {locale === "es" ? "Español" : locale === "en" ? "English" : locale.toUpperCase()}
+            {locale === "es" ? m.language_spanish() : locale === "en" ? m.language_english() : locale}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

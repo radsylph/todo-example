@@ -21,7 +21,7 @@ export function ThemeToggle() {
             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute left-0 top-0 h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           </div>
-          <span className="group-data-[collapsible=icon]:hidden">{m.theme_toggle() || 'Theme'}</span>
+          <p className="group-data-[collapsible=icon]:hidden">{m.theme_toggle() || 'Theme'}</p>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
