@@ -19,3 +19,13 @@ export enum TaskStatus {
     COMPLETED = "completed"
 }
 
+export type TaskDialogType = "update" | "delete";
+
+export interface TaskDialogContextType {
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    dialog: TaskDialogType | null;
+    setDialog: (dialog: TaskDialogType | null) => void;
+    task: Task | null;
+    setTask: (task: Task | null) => void;
+}

@@ -12,7 +12,16 @@ import {
 import { RelativeTimeCard } from "#components/ui/relative-time-card";
 import { m } from "#/paraglide/messages";
 import { Link } from "@tanstack/react-router";
-
+import { Button } from "#components/ui/button.tsx";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+} from "#components/ui/dropdown-menu.tsx";
+import { MoreHorizontal } from "lucide-react";
+import { useTaskDialog } from "../components/dialogs/taskDialogContex";
 interface TaskCardProps {
   task: Task;
 }
@@ -21,6 +30,7 @@ export function TaskCard({ task }: TaskCardProps) {
   const priority = task.priority ?? "low";
   const status = task.status ?? "active";
   const createdAt = task.createdAt ?? new Date();
+  const { setOpen, setDialog, setTask } = useTaskDialog();
 
   const taskPriority = {
     [TaskPriority.LOW]: {
@@ -67,6 +77,32 @@ export function TaskCard({ task }: TaskCardProps) {
       "bg-rose-50 dark:bg-rose-950/15 border-rose-100 dark:border-rose-900/30",
   };
 
+  const taskActionLabel = {
+    [TaskStatus.COMPLETED]: {
+      label: m.mark_active(),
+      value: TaskStatus.ACTIVE,
+    },
+    [TaskStatus.INACTIVE]: {
+      label: m.mark_active(),
+      value: TaskStatus.ACTIVE,
+    },
+    [TaskStatus.ACTIVE]: {
+      label: m.mark_completed(),
+      value: TaskStatus.COMPLETED,
+    },
+  };
+
+  const handleTaskStatusChange = () => {
+    setOpen(true);
+    setDialog("update");
+    setTask(task);
+  };
+
+  const handleTaskDelete = () => {
+    setOpen(true);
+    setDialog("delete");
+    setTask(task);
+  };
 
   const hoverRotation =
     task.id.charCodeAt(task.id.length - 1) % 2 === 0
@@ -88,25 +124,45 @@ export function TaskCard({ task }: TaskCardProps) {
           stickyColors[priority],
         )}
       >
-        <CardHeader className="flex p-0 flex-wrap w-full justify-between items-center bg-transparent">
-          <div className="flex gap-2">
-            <Badge
-              variant="outline"
-              className={cn(
-                "text-xs uppercase tracking-wider font-semibold",
-                taskStatus[status].badge,
-              )}
-            >
-              {taskStatus[status].label}
-            </Badge>
+        <CardHeader className="flex p-0 flex-row w-full justify-between items-center bg-transparent">
+          <Badge
+            variant="outline"
+            className={cn(
+              "text-xs uppercase tracking-wider font-bold",
+              taskStatus[status].badge,
+            )}
+          >
+            {taskStatus[status].label}
+          </Badge>
+          <div onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-black/5 dark:hover:bg-white/10"
+                >
+                  <MoreHorizontal className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleTaskStatusChange()}>
+                  {taskActionLabel[status].label}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => handleTaskDelete()}
+                  className="text-destructive focus:text-destructive"
+                >
+                  {m.delete()}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-          <p className="text-xs font-medium opacity-70">
-            <RelativeTimeCard date={createdAt} />
-          </p>
         </CardHeader>
 
         <CardContent className="p-0 flex flex-col gap-2 mt-2">
-          <CardTitle className="font-bold text-xl leading-tight text-foreground/90">
+          <CardTitle className="font-bold text-xl leading-tight text-foreground/90 truncate">
             {task.title}
           </CardTitle>
 
@@ -116,12 +172,20 @@ export function TaskCard({ task }: TaskCardProps) {
             </CardDescription>
           )}
         </CardContent>
-        <CardFooter className="p-0">
-          <div className="absolute bottom-3 right-3 flex items-center gap-1 justify-center">
+
+        <CardFooter className="p-1 mt-auto flex items-center justify-between">
+          <div className="text-sm font-medium opacity-50">
+            <RelativeTimeCard date={createdAt} />
+          </div>
+
+          <div className="flex items-center gap-1.5">
             <div
-              className={cn("w-2 h-2 rounded-full", taskPriority[priority].dot)}
+              className={cn(
+                "size-1.5 rounded-full",
+                taskPriority[priority].dot,
+              )}
             />
-            <span className="text-xs font-bold uppercase opacity-60">
+            <span className="text-sm font-bold capitalize opacity-60 tracking-wider">
               {taskPriority[priority].label}
             </span>
           </div>
