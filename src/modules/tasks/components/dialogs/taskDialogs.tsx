@@ -38,6 +38,30 @@ export function TaskDialogs() {
     }
   };
 
+  const deleteDescription = () => {
+    return (
+      <>
+        {m.dialog_delete_description1()}
+        {" "}
+        <span className="font-semibold">{task?.title}</span>
+        {" "}
+        {m.dialog_delete_description2()}
+      </>
+    );
+  };
+
+  const updateStatusDescription = () => {
+    return (
+      <>
+        {m.dialog_update_status_description1()}
+        {" "}
+        <span className="font-semibold">{task?.title}</span>
+        {" "}
+        {m.dialog_update_status_description2({newStatus: task?.status === TaskStatus.COMPLETED ? m.status_active() : m.status_completed()})}
+      </>
+    );
+  };
+
   return (
     <>
       <ConfirmDialog
@@ -46,8 +70,8 @@ export function TaskDialogs() {
         }
         description={
           dialog === "delete"
-            ? m.dialog_delete_description({taskTitle: task?.title || ""})
-            : m.dialog_update_status_description({taskTitle: task?.title || "", newStatus: task?.status === TaskStatus.COMPLETED ? m.status_active() : m.status_completed()})
+            ? deleteDescription()
+            : updateStatusDescription()
         }
         open={open}
         onOpenChange={(v) => {
