@@ -28,8 +28,20 @@ export const updateTaskSchema = createUpdateSchema(task, {
 }).partial()
 
 export const taskQueryOptionsSchema = baseQueryOptionsSchema.extend({
-  status: z.enum(TaskStatus).optional(),
-  priority: z.enum(TaskPriority).optional(),
+  status: z.preprocess((val) => {
+    if (typeof val === 'string') {
+      if (!val) return [];
+      return val.split(',');
+    }
+    return val;
+  }, z.array(z.enum(TaskStatus))).optional(),
+  priority: z.preprocess((val) => {
+    if (typeof val === 'string') {
+      if (!val) return [];
+      return val.split(',');
+    }
+    return val;
+  }, z.array(z.enum(TaskPriority))).optional(),
 });
 
 export type taskQueryOptions = z.infer<typeof taskQueryOptionsSchema>;

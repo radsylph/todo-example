@@ -40,10 +40,10 @@ export function useTaskFilters() {
         urlSearchParams.set("orderBy", newParams.orderBy);
       }
       if (newParams.priority) {
-        urlSearchParams.set("priority", newParams.priority);
+        urlSearchParams.set("priority", newParams.priority.join(","));
       }
       if (newParams.status) {
-        urlSearchParams.set("status", newParams.status);
+        urlSearchParams.set("status", Array.from(newParams.status).join(","));
       }
       const searchString = urlSearchParams.toString();
       const url = `/app/task/${searchString ? `?${searchString}` : ""}`;
@@ -68,7 +68,7 @@ export function useTaskFilters() {
 
   const setStatusFilter = useCallback(
     (status: TaskStatus | undefined) => {
-      updateFilters({ status: status || undefined });
+      updateFilters({ status: status ? [status] : undefined });
     },
     [updateFilters],
   );

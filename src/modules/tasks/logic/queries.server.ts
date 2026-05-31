@@ -1,4 +1,4 @@
-import { eq, and, desc, asc, ilike } from "drizzle-orm";
+import { eq, and, desc, asc, ilike, inArray } from "drizzle-orm";
 import { db } from "#/db";
 import { task } from "#/db/schema";
 import type {
@@ -10,9 +10,9 @@ import type {
 } from "../types";
 import { handleDatabaseError } from "#/db/errorHandling";
 
-// main functions
-
 const baseWhereCondition = [eq(task.isDeleted, false)];
+
+// main functions
 
 export const getTasks = async (
   options: TaskQueryOptions,
@@ -34,11 +34,11 @@ export const getTasks = async (
   }
 
   if (priority) {
-    whereConditions.push(eq(task.priority, priority));
+    whereConditions.push(inArray(task.priority, priority));
   }
 
   if (status) {
-    whereConditions.push(eq(task.status, status));
+    whereConditions.push(inArray(task.status, status));
   }
 
   const sortMapping = {
@@ -55,6 +55,8 @@ export const getTasks = async (
       : task.createdAt;
 
   try {
+    const total = await db.$count(task);
+
     const result = await db
       .select()
       .from(task)
@@ -62,8 +64,6 @@ export const getTasks = async (
       .limit(limit)
       .offset((page - 1) * limit)
       .orderBy(orderBy === "asc" ? asc(sortColumn) : desc(sortColumn));
-
-    const total = await db.$count(task);
 
     return {
       data: result.map(mapResponseToTask),
