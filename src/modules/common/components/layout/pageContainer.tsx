@@ -9,6 +9,7 @@ interface Props {
   children: React.ReactNode;
   className?: string;
   goBack?: boolean;
+  breadcrumbs?: React.ReactNode;
 }
 
 export function PageContainer({
@@ -17,12 +18,14 @@ export function PageContainer({
   children,
   className,
   goBack,
+  breadcrumbs,
 }: Props) {
   const canGoBack = useCanGoBack();
   const router = useRouter();
   return (
     <div className={cn("container p-4", className)}>
       <div className="mb-4 flex flex-col gap-2">
+        {breadcrumbs && <div className="mb-2">{breadcrumbs}</div>}
         <>
           {goBack && (
             <Button
