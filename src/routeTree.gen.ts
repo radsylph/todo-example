@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PublicRegisterRouteImport } from './routes/public/register'
+import { Route as PublicLoginRouteImport } from './routes/public/login'
 import { Route as AppTaskIndexRouteImport } from './routes/app/task/index'
 import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/index'
 import { Route as AppTaskAddRouteImport } from './routes/app/task/add'
@@ -19,6 +21,16 @@ import { Route as AppTaskEditTaskIdRouteImport } from './routes/app/task/edit.$t
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicRegisterRoute = PublicRegisterRouteImport.update({
+  id: '/public/register',
+  path: '/public/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicLoginRoute = PublicLoginRouteImport.update({
+  id: '/public/login',
+  path: '/public/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppTaskIndexRoute = AppTaskIndexRouteImport.update({
@@ -49,6 +61,8 @@ const AppTaskEditTaskIdRoute = AppTaskEditTaskIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/public/login': typeof PublicLoginRoute
+  '/public/register': typeof PublicRegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/app/task/add': typeof AppTaskAddRoute
   '/app/settings/': typeof AppSettingsIndexRoute
@@ -57,6 +71,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/public/login': typeof PublicLoginRoute
+  '/public/register': typeof PublicRegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/app/task/add': typeof AppTaskAddRoute
   '/app/settings': typeof AppSettingsIndexRoute
@@ -66,6 +82,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/public/login': typeof PublicLoginRoute
+  '/public/register': typeof PublicRegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/app/task/add': typeof AppTaskAddRoute
   '/app/settings/': typeof AppSettingsIndexRoute
@@ -76,6 +94,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/public/login'
+    | '/public/register'
     | '/api/auth/$'
     | '/app/task/add'
     | '/app/settings/'
@@ -84,6 +104,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/public/login'
+    | '/public/register'
     | '/api/auth/$'
     | '/app/task/add'
     | '/app/settings'
@@ -92,6 +114,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/public/login'
+    | '/public/register'
     | '/api/auth/$'
     | '/app/task/add'
     | '/app/settings/'
@@ -101,6 +125,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PublicLoginRoute: typeof PublicLoginRoute
+  PublicRegisterRoute: typeof PublicRegisterRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   AppTaskAddRoute: typeof AppTaskAddRoute
   AppSettingsIndexRoute: typeof AppSettingsIndexRoute
@@ -115,6 +141,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/register': {
+      id: '/public/register'
+      path: '/public/register'
+      fullPath: '/public/register'
+      preLoaderRoute: typeof PublicRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/login': {
+      id: '/public/login'
+      path: '/public/login'
+      fullPath: '/public/login'
+      preLoaderRoute: typeof PublicLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/task/': {
@@ -157,6 +197,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PublicLoginRoute: PublicLoginRoute,
+  PublicRegisterRoute: PublicRegisterRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   AppTaskAddRoute: AppTaskAddRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,
