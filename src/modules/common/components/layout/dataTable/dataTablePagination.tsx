@@ -44,26 +44,34 @@ export function DataTablePagination<TData>({
     total === 0
       ? 0
       : Math.min(pageIndex * pageSize + currentPageRowCount, total);
+      
 
   return (
     <div
-      className={cn(
-        'flex w-full flex-col-reverse items-center justify-between gap-4 overflow-auto p-1 sm:flex-row sm:gap-8',
-        className
-      )}
+       className={cn(
+              'sticky bottom-0 z-20 w-full mt-auto',
+              'bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60',
+              'border-t border-border/50 p-4 sm:px-6',
+              'flex flex-col-reverse items-center justify-between gap-4 sm:flex-row sm:gap-8',
+              className
+            )}
       {...props}
     >
       {table.getFilteredSelectedRowModel().rows.length > 0 && (
         <div className="flex-1 whitespace-nowrap text-muted-foreground text-sm">
           {m.data_table_rows_selected({
             selected: table.getFilteredSelectedRowModel().rows.length,
-            total: table.getFilteredRowModel().rows.length
+            total: table.getFilteredRowModel().rows.length,
           })}
         </div>
       )}
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground">
-          {m.data_table_showing_results({ start: startItem, end: endItem, total })}
+          {m.data_table_showing_results({
+            start: startItem,
+            end: endItem,
+            total,
+          })}
         </span>
         {isPending && (
           <Badge className="ml-2 text-muted-foreground" variant="outline">
@@ -100,7 +108,10 @@ export function DataTablePagination<TData>({
           </div>
         )}
         <div className="flex items-center justify-center font-medium text-sm">
-          {m.data_table_page_of({ page: table.getState().pagination.pageIndex + 1, total: table.getPageCount() })}
+          {m.data_table_page_of({
+            page: table.getState().pagination.pageIndex + 1,
+            total: table.getPageCount(),
+          })}
         </div>
         <div className="flex items-center space-x-2">
           <Button

@@ -55,15 +55,15 @@ export function DataTableToolbar<TData>({
       )}
       {...props}
     >
-      <div className="flex flex-1 flex-wrap items-center gap-2">
+      <div className="flex flex-1 flex-wrap items-center gap-2 w-full sm:w-auto">
         {onSearchChange && (
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <div className="relative w-full sm:w-auto">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={searchPlaceholder}
               value={searchValue ?? ''}
               onChange={(event) => onSearchChange(event.target.value)}
-              className="pl-8 text-sm h-8 w-68 lg:w-56"
+              className="pl-9 text-sm h-10 sm:h-9 w-full sm:w-64 lg:w-72 bg-background/50 focus-visible:ring-1 transition-all"
             />
           </div>
         )}
@@ -74,13 +74,12 @@ export function DataTableToolbar<TData>({
         {(isFiltered || searchValue) && (
           <Button
             aria-label={m.data_table_reset_filters()}
-            variant="outline"
-            className="border-dashed"
-            size="sm"
+            variant="ghost"
+            className="h-10 sm:h-9 px-2 lg:px-3 text-muted-foreground hover:text-foreground"
             onClick={onReset}
           >
-            <X />
-            Reset
+            {m.data_table_reset_filters()}
+            <X className="ml-2 size-4" />
           </Button>
         )}
       </div>
