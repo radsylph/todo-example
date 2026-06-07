@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   type Control,
   type FieldPath,
@@ -13,6 +14,8 @@ import {
 } from "../ui/form";
 import { Input } from "#components/ui/input";
 import { cn } from "../../../../lib/utils";
+import { Eye, EyeOff } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface InputElementProps<
   TFormValues extends FieldValues,
@@ -37,6 +40,9 @@ export function InputElement<
   renderRightAdornment,
   ...props
 }: InputElementProps<TFormValues, TName>) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = props.type === "password";
+
   return (
     <FormField
       control={control}
@@ -55,16 +61,41 @@ export function InputElement<
             </FormLabel>
           )}
           <FormControl>
-            <Input
-              {...field}
-              value={field.value ?? ""}
-              placeholder={props.placeholder}
-              className={cn("text-base font-medium", props.inputClassName)}
-              type={props.type ?? "text"}
-              disabled={props.disabled}
-              autoComplete={props.autoComplete}
-              suffix={renderRightAdornment?.(field.value)}
-            />
+            <div className="relative flex items-center">
+              <Input
+                {...field}
+                value={field.value ?? ""}
+                placeholder={props.placeholder}
+                className={cn(
+                  "text-base font-medium",
+                  isPassword && "pr-10",
+                  props.inputClassName,
+                )}
+                type={isPassword ? (showPassword ? "text" : "password") : (props.type ?? "text")}
+                disabled={props.disabled}
+                autoComplete={props.autoComplete}
+              />
+              {isPassword && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full flex items-center justify-center px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
+                </Button>
+              )}
+              {!isPassword && renderRightAdornment && (
+                 <div className="absolute right-0 top-0 h-full flex items-center pr-3">
+                   {renderRightAdornment(field.value)}
+                 </div>
+              )}
+            </div>
           </FormControl>
           {props.description && (
             <FormDescription className="text-base">{props.description}</FormDescription>
