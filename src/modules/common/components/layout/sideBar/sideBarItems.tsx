@@ -26,7 +26,7 @@ export function SideBarItems({items, pathname}: SideBarItemsProps) {
             tooltip={item.title}
             className={cn(
               "w-full transition-all duration-300 ease-in-out",
-              "data-[active=true]:rounded-full data-[active=true]:font-semibold data-[active=true]:scale-105 data-[active=true]:bg-muted-foreground/20"
+              "data-[active=true]:rounded-tr-full data-[active=true]:rounded-br-full data-[active=true]:font-semibold data-[active=true]:scale-105 data-[active=true]:bg-accent/65"
             )}
           >
             <Link to={item.href}>
