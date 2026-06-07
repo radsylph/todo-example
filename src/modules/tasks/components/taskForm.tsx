@@ -71,7 +71,7 @@ export function TaskForm({ type, task }: props) {
       setLoading(false);
       router.navigate({
         to: "/app/task",
-        search: { page: 1, limit: 10, orderBy: "desc" },
+        search: { page: 1, limit: 12, orderBy: "desc" },
       });
     } else {
       setLoading(true);
@@ -80,7 +80,7 @@ export function TaskForm({ type, task }: props) {
       setLoading(false);
       router.navigate({
         to: "/app/task",
-        search: { page: 1, limit: 10, orderBy: "desc" },
+        search: { page: 1, limit: 12, orderBy: "desc" },
       });
     }
   };

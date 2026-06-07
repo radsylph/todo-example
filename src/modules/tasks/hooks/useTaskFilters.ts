@@ -26,7 +26,7 @@ export function useTaskFilters() {
       const urlSearchParams = new URLSearchParams();
 
       urlSearchParams.set("page", (newParams.page || 1).toString());
-      urlSearchParams.set("limit", (newParams.limit || 10).toString());
+      urlSearchParams.set("limit", (newParams.limit || 12).toString());
       urlSearchParams.set("sortBy", newParams.sortBy || "name");
       urlSearchParams.set("orderBy", newParams.orderBy || "asc");
 
@@ -58,7 +58,7 @@ export function useTaskFilters() {
       to: "/app/task",
       search: {
         page: 1,
-        limit: 10,
+        limit: 12,
         orderBy: "desc",
         sortBy: "createdAt",
       },

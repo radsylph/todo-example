@@ -83,7 +83,7 @@ export function TaskDataTable({ data }: TaskDataTableProps) {
       />
 
        {table.getRowModel().rows.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-2 md:mt-4 mb-4">
           {table.getRowModel().rows.map((row) => (
             <TaskCard key={row.id} task={row.original} />
           ))}
@@ -94,7 +94,7 @@ export function TaskDataTable({ data }: TaskDataTableProps) {
 
       <DataTablePagination
         table={table}
-        pageSizeOptions={[5, 10]}
+        pageSizeOptions={[12, 24]}
         totalItems={data.totalItems}
       />
     </>

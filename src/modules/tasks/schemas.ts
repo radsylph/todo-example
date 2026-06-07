@@ -28,6 +28,7 @@ export const updateTaskSchema = createUpdateSchema(task, {
 }).partial()
 
 export const taskQueryOptionsSchema = baseQueryOptionsSchema.extend({
+  limit: z.number().int().positive().default(12),
   status: z.preprocess((val) => {
     if (typeof val === 'string') {
       if (!val) return [];
