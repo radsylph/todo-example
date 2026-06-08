@@ -35,43 +35,46 @@ function RouteComponent() {
         description={m.tasks_description()}
         className="pt-8"
       >
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between rounded-2xl">
-            <div className="flex items-center gap-4">
-              <div className="flex flex-col gap-2 ">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-md font-bold">
-                    {m.tasks_count({
-                      completed: completedTasks,
-                      total: totalTasks,
-                    })}
-                  </Badge>
-                  <Badge
-                    variant={
-                      completedTasks === totalTasks && totalTasks > 0
-                        ? "default"
-                        : "secondary"
-                    }
-                    className="rounded-md font-bold text-md"
-                  >
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card/50 p-4 rounded-2xl border border-border/50 shadow-sm backdrop-blur-sm">
+            <div className="flex items-center gap-6">
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
+                  {m.tasks_title()}
+                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl font-bold tracking-tight">
+                    {totalTasks}
+                  </span>
+                  <Badge variant="secondary" className="h-6 px-2 text-xs font-semibold">
                     {totalTasks > 0
                       ? Math.round((completedTasks / totalTasks) * 100)
-                      : 0}
-                    %
+                      : 0}% {m.status_completed()}
                   </Badge>
                 </div>
               </div>
+
+              <div className="h-10 w-px bg-border/60 mx-2 hidden sm:block" />
+
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
+                  {m.completion_status()}
+                </span>
+                <span className="text-3xl font-bold tracking-tight text-primary">
+                  {completedTasks}
+                </span>
+              </div>
             </div>
 
-            <Button variant="outline" asChild className="rounded-xl">
+            <Button variant="default" asChild className="rounded-xl shadow-md hover:shadow-lg transition-all h-11 px-6">
               <Link to="/app/task/add">
-                <Plus className="mr-2" />
-                {m.new_task()}
+                <Plus className="mr-2 size-5" />
+                <span className="font-semibold">{m.new_task()}</span>
               </Link>
             </Button>
           </div>
 
-          <div className="mt-6">
+          <div className="md:mt-6">
             <TaskDataTable data={response} />
           </div>
         </div>

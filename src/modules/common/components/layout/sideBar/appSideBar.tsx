@@ -4,7 +4,6 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
   SidebarGroup,
@@ -12,17 +11,28 @@ import {
   SidebarGroupContent,
   useSidebar,
 } from "#components/ui/sidebar";
-import { Link, useLocation } from "@tanstack/react-router";
-import { List, Settings, LayoutDashboard, ChevronLeft } from "lucide-react";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import { List, LayoutDashboard, ChevronLeft, LogOut } from "lucide-react";
 import { m } from "#/paraglide/messages";
 import { SideBarItems } from "#components/layout/sideBar/sideBarItems";
 import { ThemeToggle } from "#components/layout/themeToggle";
 import { LanguageToggle } from "#components/layout/languageToggle";
 import { cn } from "#lib/utils.ts";
+import { Button } from "#components/ui/button";
+import { logoutFn } from "#modules/auth/logic/functions.ts";
+import { useState } from "react";
+import { ConfirmDialog } from "#components/layout/confirmDialog";
 
 export function AppSideBar() {
   const { pathname } = useLocation();
   const { state, isMobile } = useSidebar();
+  const navigate = useNavigate();
+  const [confirmLogout, setConfirmLogout] = useState(false);
+
+  const handleLogout = async () => {
+    await logoutFn();
+    navigate({ to: "/public/login" });
+  };
 
   const sideBarItemsContent = [
     {
@@ -36,7 +46,7 @@ export function AppSideBar() {
     <Sidebar
       collapsible="icon"
       variant={isMobile ? "sidebar" : "floating"}
-      className="border-r-0 transition-all duration-300 ease-in-out"
+      className="transition-all duration-300 ease-in-out bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60"
     >
       <SidebarHeader className="relative h-16 border-b border-sidebar-border justify-center">
         <div className="flex items-center gap-3 px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
@@ -67,7 +77,7 @@ export function AppSideBar() {
           <SidebarGroupLabel className="text-base font-bold tracking-widest text-accent-foreground">
             {m.sider_bar_title()}
           </SidebarGroupLabel>
-          <SidebarGroupContent>
+          <SidebarGroupContent className="mt-6">
             <SideBarItems items={sideBarItemsContent} pathname={pathname} />
           </SidebarGroupContent>
         </SidebarGroup>
@@ -80,21 +90,31 @@ export function AppSideBar() {
           <SidebarMenuItem>
             <ThemeToggle />
           </SidebarMenuItem>
-          {/* <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname === "/app/settings"}
-              tooltip={m.nav_settings()}
-              className="w-full transition-all duration-200"
+          <SidebarMenuItem>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-full justify-start gap-2 px-2 hover:text-sidebar-accent-foreground hover:bg-red-500/10"
+              onClick={() => setConfirmLogout(true)}
             >
-              <Link to="/app/settings">
-                <Settings />
-                <span className="font-semibold">{m.nav_settings()}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem> */}
+              <LogOut className="size-4 text-rose-500" />
+              <p className="group-data-[collapsible=icon]:hidden text-rose-500">
+                {m.logout()}
+              </p>
+            </Button>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+      <ConfirmDialog
+        open={confirmLogout}
+        onOpenChange={setConfirmLogout}
+        title={m.auth_logout_confirm_title()}
+        description={m.auth_logout_confirm_description()}
+        onConfirm={handleLogout}
+        isDestructive
+        confirmBtnText={m.logout()}
+        icon={<LogOut className="size-4" />}
+      />
     </Sidebar>
   );
 }
