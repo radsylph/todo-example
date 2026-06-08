@@ -9,18 +9,43 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PublicRegisterRouteImport } from './routes/public/register'
+import { Route as PublicLoginRouteImport } from './routes/public/login'
+import { Route as AppTaskIndexRouteImport } from './routes/app/task/index'
+import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/index'
+import { Route as AppTaskAddRouteImport } from './routes/app/task/add'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AppTaskEditTaskIdRouteImport } from './routes/app/task/edit.$taskId'
 
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicRegisterRoute = PublicRegisterRouteImport.update({
+  id: '/public/register',
+  path: '/public/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicLoginRoute = PublicLoginRouteImport.update({
+  id: '/public/login',
+  path: '/public/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppTaskIndexRoute = AppTaskIndexRouteImport.update({
+  id: '/app/task/',
+  path: '/app/task/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppSettingsIndexRoute = AppSettingsIndexRouteImport.update({
+  id: '/app/settings/',
+  path: '/app/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppTaskAddRoute = AppTaskAddRouteImport.update({
+  id: '/app/task/add',
+  path: '/app/task/add',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -28,51 +53,129 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTaskEditTaskIdRoute = AppTaskEditTaskIdRouteImport.update({
+  id: '/app/task/edit/$taskId',
+  path: '/app/task/edit/$taskId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/public/login': typeof PublicLoginRoute
+  '/public/register': typeof PublicRegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/app/task/add': typeof AppTaskAddRoute
+  '/app/settings/': typeof AppSettingsIndexRoute
+  '/app/task/': typeof AppTaskIndexRoute
+  '/app/task/edit/$taskId': typeof AppTaskEditTaskIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/public/login': typeof PublicLoginRoute
+  '/public/register': typeof PublicRegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/app/task/add': typeof AppTaskAddRoute
+  '/app/settings': typeof AppSettingsIndexRoute
+  '/app/task': typeof AppTaskIndexRoute
+  '/app/task/edit/$taskId': typeof AppTaskEditTaskIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/public/login': typeof PublicLoginRoute
+  '/public/register': typeof PublicRegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/app/task/add': typeof AppTaskAddRoute
+  '/app/settings/': typeof AppSettingsIndexRoute
+  '/app/task/': typeof AppTaskIndexRoute
+  '/app/task/edit/$taskId': typeof AppTaskEditTaskIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/public/login'
+    | '/public/register'
+    | '/api/auth/$'
+    | '/app/task/add'
+    | '/app/settings/'
+    | '/app/task/'
+    | '/app/task/edit/$taskId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/api/auth/$'
-  id: '__root__' | '/' | '/about' | '/api/auth/$'
+  to:
+    | '/'
+    | '/public/login'
+    | '/public/register'
+    | '/api/auth/$'
+    | '/app/task/add'
+    | '/app/settings'
+    | '/app/task'
+    | '/app/task/edit/$taskId'
+  id:
+    | '__root__'
+    | '/'
+    | '/public/login'
+    | '/public/register'
+    | '/api/auth/$'
+    | '/app/task/add'
+    | '/app/settings/'
+    | '/app/task/'
+    | '/app/task/edit/$taskId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
+  PublicLoginRoute: typeof PublicLoginRoute
+  PublicRegisterRoute: typeof PublicRegisterRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  AppTaskAddRoute: typeof AppTaskAddRoute
+  AppSettingsIndexRoute: typeof AppSettingsIndexRoute
+  AppTaskIndexRoute: typeof AppTaskIndexRoute
+  AppTaskEditTaskIdRoute: typeof AppTaskEditTaskIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/register': {
+      id: '/public/register'
+      path: '/public/register'
+      fullPath: '/public/register'
+      preLoaderRoute: typeof PublicRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/login': {
+      id: '/public/login'
+      path: '/public/login'
+      fullPath: '/public/login'
+      preLoaderRoute: typeof PublicLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/task/': {
+      id: '/app/task/'
+      path: '/app/task'
+      fullPath: '/app/task/'
+      preLoaderRoute: typeof AppTaskIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/settings/': {
+      id: '/app/settings/'
+      path: '/app/settings'
+      fullPath: '/app/settings/'
+      preLoaderRoute: typeof AppSettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/task/add': {
+      id: '/app/task/add'
+      path: '/app/task/add'
+      fullPath: '/app/task/add'
+      preLoaderRoute: typeof AppTaskAddRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -82,13 +185,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/task/edit/$taskId': {
+      id: '/app/task/edit/$taskId'
+      path: '/app/task/edit/$taskId'
+      fullPath: '/app/task/edit/$taskId'
+      preLoaderRoute: typeof AppTaskEditTaskIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  PublicLoginRoute: PublicLoginRoute,
+  PublicRegisterRoute: PublicRegisterRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  AppTaskAddRoute: AppTaskAddRoute,
+  AppSettingsIndexRoute: AppSettingsIndexRoute,
+  AppTaskIndexRoute: AppTaskIndexRoute,
+  AppTaskEditTaskIdRoute: AppTaskEditTaskIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

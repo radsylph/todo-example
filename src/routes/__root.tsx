@@ -1,23 +1,50 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { HeadContent, Scripts, createRootRoute, redirect } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import Footer from '../components/Footer'
-import Header from '../components/Header'
+import { NotFoundComponent } from '../modules/common/components/notFoundComponent'
 
 import { getLocale } from '#/paraglide/runtime'
 
 import appCss from '../styles.css?url'
+import { Toaster } from '#components/ui/sonner'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '#components/ui/sidebar'
+import { AppSideBar } from '#components/layout/sideBar/appSideBar'
+import { Separator } from '#components/ui/separator'
 
-const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
+import { ThemeProvider } from 'next-themes'
+import { getSessionFn } from '#modules/auth/logic/functions'
 
+// const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
+// hacer otra implementación con zustand para el manejo de los temas.
 export const Route = createRootRoute({
-  beforeLoad: async () => {
-    // Other redirect strategies are possible; see
-    // https://github.com/TanStack/router/tree/main/examples/react/i18n-paraglide#offline-redirect
+  beforeLoad: async ({ location }) => {
+    const session = await getSessionFn()
+    const isAuthPath = location.pathname === '/public/login' || location.pathname === '/public/register'
+    
+    if (!session && !isAuthPath) {
+      throw redirect({
+        to: '/public/login',
+        search: {
+          redirect: location.href,
+        },
+      })
+    }
+    
+    if (session && isAuthPath) {
+      throw redirect({
+        to: '/',
+      })
+    }
+
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('lang', getLocale())
     }
+
+    return {
+      session
+    }
   },
+
 
   head: () => ({
     meta: [
@@ -29,7 +56,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'TTT | TanStack Todo',
       },
     ],
     links: [
@@ -40,19 +67,41 @@ export const Route = createRootRoute({
     ],
   }),
   shellComponent: RootDocument,
+  notFoundComponent: () => NotFoundComponent(),
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const locale = getLocale()
+  const { session } = Route.useRouteContext()
+
   return (
-    <html lang={getLocale()} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
-        <Header />
-        {children}
-        <Footer />
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          {session ? (
+            <SidebarProvider>
+              <AppSideBar />
+              <SidebarInset className="flex flex-col h-svh">
+                <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4 md:hidden">
+                  <SidebarTrigger />
+                  <Separator orientation="vertical" className="mr-2 h-4" />
+                  <div className="font-bold">TanStack Todo</div>
+                </header>
+                <main className="flex-1 overflow-y-auto">
+                  {children}
+                </main>
+              </SidebarInset>
+            </SidebarProvider>
+          ) : (
+            <main className="flex-1 h-svh">
+              {children}
+            </main>
+          )}
+        </ThemeProvider>
+
         <TanStackDevtools
           config={{
             position: 'bottom-right',
@@ -65,6 +114,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           ]}
         />
         <Scripts />
+        <Toaster position='top-center' richColors expand/>
       </body>
     </html>
   )

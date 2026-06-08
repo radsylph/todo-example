@@ -1,0 +1,53 @@
+import { createInsertSchema, createSelectSchema, createUpdateSchema} from 'drizzle-zod';
+import {task} from '#/db/schema';
+import { baseQueryOptionsSchema, basePaginationResponseSchema } from '#modules/common/types/generalPaginationTypes.ts';
+import {TaskStatus, TaskPriority} from "./types";
+import {z} from "zod";
+
+export const selectTaskSchema = createSelectSchema(task);
+
+export const createTaskSchema = createInsertSchema(task, {
+  title: (schema) => schema.min(1, "The title is obligatory"),
+  description: (schema) => schema.optional(),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  isDeleted: true,
+  deletedAt: true,
+})
+
+export const updateTaskSchema = createUpdateSchema(task, {
+  title: (schema) => schema.min(1, "The title is obligatory"),
+  description: (schema) => schema.optional(),
+}).omit({
+  createdAt: true,
+  updatedAt: true,
+  isDeleted: true,
+  deletedAt: true,
+}).partial()
+
+export const taskQueryOptionsSchema = baseQueryOptionsSchema.extend({
+  limit: z.number().int().positive().default(12),
+  status: z.preprocess((val) => {
+    if (typeof val === 'string') {
+      if (!val) return [];
+      return val.split(',');
+    }
+    return val;
+  }, z.array(z.enum(TaskStatus))).optional(),
+  priority: z.preprocess((val) => {
+    if (typeof val === 'string') {
+      if (!val) return [];
+      return val.split(',');
+    }
+    return val;
+  }, z.array(z.enum(TaskPriority))).optional(),
+});
+
+export type taskQueryOptions = z.infer<typeof taskQueryOptionsSchema>;
+
+export const taskPaginationResponseSchema = basePaginationResponseSchema.extend({
+  data: z.array(selectTaskSchema),
+});
+
