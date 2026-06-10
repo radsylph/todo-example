@@ -1,7 +1,11 @@
 import { defineConfig } from 'drizzle-kit'
 import { loadEnvFile } from 'node:process';
 
-loadEnvFile('.env');
+try {
+  loadEnvFile('.env');
+} catch (e) {
+  // Ignore error if .env file is missing
+}
 
 
 export default defineConfig({

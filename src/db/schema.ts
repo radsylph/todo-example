@@ -1,7 +1,13 @@
-import { boolean, pgTable, uuid, text, varchar, timestamp, pgEnum } from 'drizzle-orm/pg-core'
+import { boolean, pgTable, uuid, text, varchar, timestamp, pgEnum, numeric, integer } from 'drizzle-orm/pg-core'
 
 export const statusEnum = pgEnum('status', ['active', 'inactive', 'completed'])
 export const priorityEnum = pgEnum('priority', ['low', 'medium', 'high'])
+export const typeEnum = pgEnum('type', ['income', 'expense'])
+export const paymentMethod = pgEnum('payment_method', ['cash', 'card', 'bank_transfer'])
+export const orderStatusEnum = pgEnum('order_status', ['pending', 'paid', 'cancelled', 'shipped'])
+
+
+
 
 export const task = pgTable('tasks', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -65,4 +71,57 @@ export const verification = pgTable("verification", {
 	updatedAt: timestamp("updated_at"),
 });
 
+export const movement = pgTable("movement" , {
+	id: uuid("id").primaryKey().defaultRandom(),
+	userId: text("user_id").notNull().references(() => user.id),
+	productId: uuid("product_id").notNull().references(() => product.id),
+	name: varchar("name", { length: 255 }).notNull(),
+	amount: numeric("amount").notNull(),
+	type: typeEnum("type").notNull(),
+	paymentMethod: paymentMethod("payment_method").notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
+	deletedAt: timestamp("deleted_at"),
+})
+
+export const product = pgTable('product', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	name: varchar('name', { length: 255 }).notNull(),
+	imageLink: varchar('image_link', { length: 255 }).notNull(),
+	price: numeric('price').notNull(),
+	createdAt: timestamp('created_at').defaultNow().notNull(),
+	updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
+	deletedAt: timestamp('deleted_at'),
+	userId: text('user_id').notNull().references(() => user.id),
+})
+
+export const salesOrder = pgTable('sales_order', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	userId: text('user_id').notNull().references(() => user.id),
+	customerName: varchar('customer_name', { length: 255 }),
+	total: numeric('total').default('0').notNull(),
+	status: orderStatusEnum('status').default('pending').notNull(),
+	createdAt: timestamp('created_at').defaultNow().notNull(),
+	updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
+})
+
+export const orderItem = pgTable('order_item', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	orderId: uuid('order_id').notNull().references(() => salesOrder.id),
+	productId: uuid('product_id').notNull().references(() => product.id),
+	quantity: integer('quantity').notNull(),
+	unitPrice: numeric('unit_price').notNull(),
+	createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
+export const payment = pgTable('payment', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	orderId: uuid('order_id').notNull().references(() => salesOrder.id),
+	amount: numeric('amount').notNull(),
+	method: paymentMethod('method').notNull(),
+	createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
+
+	
 
