@@ -14,6 +14,7 @@ import { Route as PublicRegisterRouteImport } from './routes/public/register'
 import { Route as PublicLoginRouteImport } from './routes/public/login'
 import { Route as AppTaskIndexRouteImport } from './routes/app/task/index'
 import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/index'
+import { Route as AppClientFormIndexRouteImport } from './routes/app/clientForm/index'
 import { Route as AppTaskAddRouteImport } from './routes/app/task/add'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AppTaskEditTaskIdRouteImport } from './routes/app/task/edit.$taskId'
@@ -43,6 +44,11 @@ const AppSettingsIndexRoute = AppSettingsIndexRouteImport.update({
   path: '/app/settings/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppClientFormIndexRoute = AppClientFormIndexRouteImport.update({
+  id: '/app/clientForm/',
+  path: '/app/clientForm/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppTaskAddRoute = AppTaskAddRouteImport.update({
   id: '/app/task/add',
   path: '/app/task/add',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/public/register': typeof PublicRegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/app/task/add': typeof AppTaskAddRoute
+  '/app/clientForm/': typeof AppClientFormIndexRoute
   '/app/settings/': typeof AppSettingsIndexRoute
   '/app/task/': typeof AppTaskIndexRoute
   '/app/task/edit/$taskId': typeof AppTaskEditTaskIdRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/public/register': typeof PublicRegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/app/task/add': typeof AppTaskAddRoute
+  '/app/clientForm': typeof AppClientFormIndexRoute
   '/app/settings': typeof AppSettingsIndexRoute
   '/app/task': typeof AppTaskIndexRoute
   '/app/task/edit/$taskId': typeof AppTaskEditTaskIdRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/public/register': typeof PublicRegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/app/task/add': typeof AppTaskAddRoute
+  '/app/clientForm/': typeof AppClientFormIndexRoute
   '/app/settings/': typeof AppSettingsIndexRoute
   '/app/task/': typeof AppTaskIndexRoute
   '/app/task/edit/$taskId': typeof AppTaskEditTaskIdRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/public/register'
     | '/api/auth/$'
     | '/app/task/add'
+    | '/app/clientForm/'
     | '/app/settings/'
     | '/app/task/'
     | '/app/task/edit/$taskId'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/public/register'
     | '/api/auth/$'
     | '/app/task/add'
+    | '/app/clientForm'
     | '/app/settings'
     | '/app/task'
     | '/app/task/edit/$taskId'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/public/register'
     | '/api/auth/$'
     | '/app/task/add'
+    | '/app/clientForm/'
     | '/app/settings/'
     | '/app/task/'
     | '/app/task/edit/$taskId'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   PublicRegisterRoute: typeof PublicRegisterRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   AppTaskAddRoute: typeof AppTaskAddRoute
+  AppClientFormIndexRoute: typeof AppClientFormIndexRoute
   AppSettingsIndexRoute: typeof AppSettingsIndexRoute
   AppTaskIndexRoute: typeof AppTaskIndexRoute
   AppTaskEditTaskIdRoute: typeof AppTaskEditTaskIdRoute
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/clientForm/': {
+      id: '/app/clientForm/'
+      path: '/app/clientForm'
+      fullPath: '/app/clientForm/'
+      preLoaderRoute: typeof AppClientFormIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/task/add': {
       id: '/app/task/add'
       path: '/app/task/add'
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   PublicRegisterRoute: PublicRegisterRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   AppTaskAddRoute: AppTaskAddRoute,
+  AppClientFormIndexRoute: AppClientFormIndexRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,
   AppTaskIndexRoute: AppTaskIndexRoute,
   AppTaskEditTaskIdRoute: AppTaskEditTaskIdRoute,
