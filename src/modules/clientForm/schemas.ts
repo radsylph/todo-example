@@ -121,6 +121,7 @@ export const healthStatementSchema = z.object({
 export const beneficiarySchema = z.object({
   relation: z.enum(beneficiaryRelation),
   name: z.string(),
+  birthDay: z.string(),
   percent: z.number(),
 });
 

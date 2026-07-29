@@ -237,5 +237,7 @@
   "client_form_validation_time_in_us_required": "El tiempo en EE.UU. es obligatorio si no es ciudadano estadounidense",
   "client_form_validation_employer_name_required": "El nombre del empleador es obligatorio si está empleado/a o es estudiante",
   "client_form_validation_occupation_required": "La ocupación y funciones son obligatorias si está empleado/a o es estudiante",
-  "client_form_validation_beneficiary_percent": "Los porcentajes deben sumar 100"
+  "client_form_validation_beneficiary_percent": "Los porcentajes deben sumar 100",
+  "client_form_beneficiary_birth_day": "Fecha de nacimiento del beneficiario.",
+  "client_form_beneficiary_birth_day_placeholder": "MM/DD/YYYY"
 }

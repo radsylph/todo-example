@@ -241,5 +241,7 @@
   "client_form_validation_time_in_us_required": "Time in US is required when not a US citizen",
   "client_form_validation_employer_name_required": "Employer name is required when employed or a student",
   "client_form_validation_occupation_required": "Occupation and duties is required when employed or a student",
-  "client_form_validation_beneficiary_percent": "Percentages must sum to 100"
+  "client_form_validation_beneficiary_percent": "Percentages must sum to 100",
+  "client_form_beneficiary_birth_day": "Beneficiary birthday.",
+  "client_form_beneficiary_birth_day_placeholder": "MM/DD/YYYY"
 }
