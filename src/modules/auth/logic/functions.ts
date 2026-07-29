@@ -3,6 +3,60 @@ import { auth } from "#/lib/auth";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 
+export type Session = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  expiresAt: Date;
+  token: string;
+  ipAddress?: string | null | undefined;
+  userAgent?: string | null | undefined;
+};
+
+let cacheSession: Session | null = null;
+
+export const clearSessionCache = () => {
+  cacheSession = null;
+};
+
+export const getCachedSession = async (): Promise<Session | null> => {
+  if (cacheSession) {
+    const now = Date.now();
+    const createdAt = new Date(cacheSession.createdAt).getTime();
+    const expiresAt = new Date(cacheSession.expiresAt).getTime();
+
+    if (expiresAt <= now) {
+      cacheSession = null;
+    } else {
+      const totalLifetime = expiresAt - createdAt;
+      const remainingTime = expiresAt - now;
+
+      if (remainingTime < totalLifetime / 2) {
+        const fresh = await getSessionFn();
+
+        if (fresh?.session) {
+          cacheSession = fresh.session;
+        } else {
+          cacheSession = null;
+        }
+      }
+
+      return cacheSession;
+    }
+  }
+
+  const session = await getSessionFn();
+
+  if (session?.session) {
+    cacheSession = session.session;
+  }
+
+  return cacheSession;
+};
+
+// ── Server functions ──
+
 export const getSessionFn = createServerFn({ method: "GET" }).handler(
   async () => {
     const request = getRequest();
