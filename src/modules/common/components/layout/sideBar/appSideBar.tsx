@@ -1,27 +1,33 @@
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import {
+  ChevronLeft,
+  FileText,
+  LayoutDashboard,
+  List,
+  LogOut,
+} from "lucide-react";
+import { useState } from "react";
+import { m } from "#/paraglide/messages";
+import { ConfirmDialog } from "#components/layout/confirmDialog";
+import { LanguageToggle } from "#components/layout/languageToggle";
+import { SideBarItems } from "#components/layout/sideBar/sideBarItems";
+import { ThemeToggle } from "#components/layout/themeToggle";
+import { Button } from "#components/ui/button";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarTrigger,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
   useSidebar,
 } from "#components/ui/sidebar";
-import { useLocation, useNavigate } from "@tanstack/react-router";
-import { List, LayoutDashboard, ChevronLeft, LogOut } from "lucide-react";
-import { m } from "#/paraglide/messages";
-import { SideBarItems } from "#components/layout/sideBar/sideBarItems";
-import { ThemeToggle } from "#components/layout/themeToggle";
-import { LanguageToggle } from "#components/layout/languageToggle";
 import { cn } from "#lib/utils.ts";
-import { Button } from "#components/ui/button";
-import { logoutFn } from "#modules/auth/logic/functions.ts";
-import { useState } from "react";
-import { ConfirmDialog } from "#components/layout/confirmDialog";
+import { logoutFn, clearSessionCache } from "#modules/auth/logic/functions.ts";
 
 export function AppSideBar() {
   const { pathname } = useLocation();
@@ -31,6 +37,7 @@ export function AppSideBar() {
 
   const handleLogout = async () => {
     await logoutFn();
+    clearSessionCache();
     navigate({ to: "/public/login" });
   };
 
@@ -39,6 +46,11 @@ export function AppSideBar() {
       title: m.tasks_title(),
       href: "/app/task",
       icon: <List className="size-4" />,
+    },
+    {
+      title: m.client_form_title(),
+      href: "/app/clientForm",
+      icon: <FileText className="size-4" />,
     },
   ];
 

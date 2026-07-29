@@ -1,9 +1,9 @@
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import {
-  type Control,
-  type FieldPath,
-  type FieldValues,
-} from "react-hook-form";
+import type { Control, FieldPath, FieldValues } from "react-hook-form";
+import { Input } from "#components/ui/input";
+import { cn } from "../../../../lib/utils";
+import { Button } from "../ui/button";
 import {
   FormControl,
   FormDescription,
@@ -12,10 +12,9 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { Input } from "#components/ui/input";
-import { cn } from "../../../../lib/utils";
-import { Eye, EyeOff } from "lucide-react";
-import { Button } from "../ui/button";
+
+/** Callback to transform the raw string value while the user types. */
+export type InputFormatter = (raw: string) => string;
 
 interface InputElementProps<
   TFormValues extends FieldValues,
@@ -29,6 +28,12 @@ interface InputElementProps<
   inputClassName?: string;
   labelClassName?: string;
   renderRightAdornment?: (fieldValue: TFormValues[TName]) => React.ReactNode;
+  /**
+   * Optional value formatter run on every keypress.
+   * Only applies when `type` is NOT `"number"`.
+   * Example: `format={(v) => v.replace(/\D/g, "").slice(0, 9)}`
+   */
+  format?: InputFormatter;
 }
 
 export function InputElement<
@@ -51,7 +56,7 @@ export function InputElement<
         <FormItem className={cn("", props.className)}>
           {props.label && (
             <FormLabel className={cn("", props.labelClassName)}>
-             <p className="text-base font-medium">{props.label}</p>
+              <p className="text-base font-medium">{props.label}</p>
               {props.required && (
                 <span className="text-red-500 font-bold">*</span>
               )}
@@ -64,14 +69,38 @@ export function InputElement<
             <div className="relative flex items-center">
               <Input
                 {...field}
-                value={field.value ?? ""}
+                value={
+                  props.type === "number"
+                    ? typeof field.value === "number" &&
+                      !Number.isNaN(field.value)
+                      ? field.value
+                      : ""
+                    : (field.value ?? "")
+                }
+                onChange={(e) => {
+                  if (props.type === "number") {
+                    const value = e.target.valueAsNumber;
+                    field.onChange(Number.isNaN(value) ? undefined : value);
+                  } else if (props.format) {
+                    const formatted = props.format(e.target.value);
+                    field.onChange(formatted);
+                  } else {
+                    field.onChange(e);
+                  }
+                }}
                 placeholder={props.placeholder}
                 className={cn(
                   "text-base font-medium",
                   isPassword && "pr-10",
                   props.inputClassName,
                 )}
-                type={isPassword ? (showPassword ? "text" : "password") : (props.type ?? "text")}
+                type={
+                  isPassword
+                    ? showPassword
+                      ? "text"
+                      : "password"
+                    : (props.type ?? "text")
+                }
                 disabled={props.disabled}
                 autoComplete={props.autoComplete}
               />
@@ -91,14 +120,16 @@ export function InputElement<
                 </Button>
               )}
               {!isPassword && renderRightAdornment && (
-                 <div className="absolute right-0 top-0 h-full flex items-center pr-3">
-                   {renderRightAdornment(field.value)}
-                 </div>
+                <div className="absolute right-0 top-0 h-full flex items-center pr-3">
+                  {renderRightAdornment(field.value)}
+                </div>
               )}
             </div>
           </FormControl>
           {props.description && (
-            <FormDescription className="text-base">{props.description}</FormDescription>
+            <FormDescription className="text-base">
+              {props.description}
+            </FormDescription>
           )}
           <FormMessage />
         </FormItem>
