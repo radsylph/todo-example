@@ -163,7 +163,7 @@
   "auth_logout_confirm_description": "Are you sure you want to logout?",
   "client_form_title": "Client Form",
   "client_form_description": "Fill in the client information across all sections",
-  "client_form_saved_success": "Client form submitted successfully",
+  "client_form_saved_success": "Client form data copied to clipboard",
   "client_form_tab_primary": "Primary Insured",
   "client_form_tab_health": "Health Statement",
   "client_form_tab_beneficiaries": "Beneficiaries",

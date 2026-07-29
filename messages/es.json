@@ -159,7 +159,7 @@
   "auth_logout_confirm_description": "¿Estás seguro de que quieres cerrar sesión?",
   "client_form_title": "Formulario de Cliente",
   "client_form_description": "Complete la información del cliente en todas las secciones",
-  "client_form_saved_success": "Formulario de cliente enviado con éxito",
+  "client_form_saved_success": "Datos del formulario copiados al portapapeles",
   "client_form_tab_primary": "Asegurado Principal",
   "client_form_tab_health": "Declaración de Salud",
   "client_form_tab_beneficiaries": "Beneficiarios",

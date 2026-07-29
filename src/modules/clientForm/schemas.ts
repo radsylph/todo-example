@@ -94,13 +94,13 @@ export const beneficiaryRelation = [
 // ─── Sub-schemas ───
 
 export const primaryInsuredSchema = z.object({
-  ssn: z.string(),
+  ssn: z.string().min(1, "SSN is required"),
   driversLicenseIssueState: z.enum([...usStates, "none"]),
   maritalStatus: z.enum(maritalStatus),
   stateOfBirth: z.enum([...usStates, "other"]),
   birthPlace: z.string(),
   emailAddress: z.email(),
-  cellphoneNumber: z.string(),
+  cellphoneNumber: z.string().min(1, "Phone is required"),
   employerStatus: z.enum(employerStatus),
   employerName: z.string(),
   occupationAndDuties: z.string(),
@@ -143,22 +143,14 @@ export const clientFormSchema = z
   })
   .superRefine((data, ctx) => {
     const insured = data.primaryInsured;
+    console.log("test");
 
-    // SSN must match XXX-XX-XXXX
-    if (!/^\d{3}-\d{2}-\d{4}$/.test(insured.ssn)) {
+    // Birth place required only when stateOfBirth is "other"
+    if (insured.stateOfBirth === "other" && !insured.birthPlace.trim()) {
       ctx.addIssue({
         code: "custom",
-        path: ["primaryInsured", "ssn"],
-        message: m.client_form_validation_ssn(),
-      });
-    }
-
-    // Phone must match (XXX) XXX-XXXX
-    if (!/^\(\d{3}\) \d{3}-\d{4}$/.test(insured.cellphoneNumber)) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["primaryInsured", "cellphoneNumber"],
-        message: m.client_form_validation_phone(),
+        path: ["primaryInsured", "birthPlace"],
+        message: "Birth place is required",
       });
     }
 
@@ -187,11 +179,8 @@ export const clientFormSchema = z
       }
     }
 
-    // Employer / occupation only relevant when employed or a student
-    if (
-      insured.employerStatus !== "disabled" &&
-      insured.employerStatus !== "retired"
-    ) {
+    // Employer / occupation only relevant when employed
+    if (insured.employerStatus === "employed") {
       if (!insured.employerName.trim()) {
         ctx.addIssue({
           code: "custom",
@@ -207,7 +196,6 @@ export const clientFormSchema = z
         });
       }
     }
-
     // Beneficiary percentages must sum to 100 when any exist
     if (data.beneficiaries.length > 0) {
       const total = data.beneficiaries.reduce(
