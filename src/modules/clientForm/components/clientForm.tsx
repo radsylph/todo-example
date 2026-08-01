@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
+import { useIsMobile } from "#modules/common/hooks/useMobile.ts";
 import { m } from "#/paraglide/messages";
 import { InputElement } from "#components/forms/inputElement.tsx";
 import {
@@ -135,6 +136,8 @@ const beneficiaryRelationOptions = beneficiaryRelation.map((value) => ({
 
 const defaultValues: ClientFormSchema = {
   primaryInsured: {
+    name: "",
+    address: "",
     ssn: "",
     driversLicenseIssueState: "none",
     maritalStatus: "single",
@@ -151,8 +154,8 @@ const defaultValues: ClientFormSchema = {
     timeInUS: 0,
   },
   healthStatement: {
-    height: 170,
-    weight: 70,
+    height: { feet: 5, inches: 7 },
+    weight: 154,
     primaryPhysician: false,
     primaryPhysicianInfomation: "",
     lastConsult: "",
@@ -176,7 +179,7 @@ function TabsForm({ value, icon, label }: TabsProps) {
   return (
     <TabsTrigger
       value={value}
-      className="data-[state=active]:bg-card data-[state=active]:shadow-sm data-[state=active]:[&_svg]:text-primary hover:cursor-pointer"
+      className="data-[state=active]:bg-card data-[state=active]:[&_svg]:text-primary hover:cursor-pointer"
     >
       {icon}
       {label}
@@ -186,6 +189,7 @@ function TabsForm({ value, icon, label }: TabsProps) {
 
 export function ClientForm() {
   const [loading, setLoading] = useState(false);
+  const isMobile = useIsMobile();
 
   const tabs = [
     {
@@ -259,8 +263,12 @@ export function ClientForm() {
   return (
     <Form {...form}>
       <FormLayout onSubmit={onSubmit} isSubmitting={loading}>
-        <Tabs defaultValue="primary" className="w-full">
-          <TabsList className="w-full" variant="default">
+        <Tabs
+          defaultValue="primary"
+          orientation={isMobile ? "vertical" : "horizontal"}
+          className="w-full flex-col"
+        >
+          <TabsList className="w-full">
             {tabs.map((tab) => (
               <TabsForm key={tab.value} {...tab} />
             ))}
@@ -268,13 +276,34 @@ export function ClientForm() {
 
           {/* ─── Primary Insured ─── */}
           <TabsContent value="primary">
-            <Card>
-              <CardHeader>
-                <CardTitle>{m.client_form_tab_primary()}</CardTitle>
-                <CardDescription>{m.client_form_description()}</CardDescription>
+            <Card className="py-4 sm:py-6">
+              <CardHeader className="px-4 sm:px-6">
+                <CardTitle className="text-base sm:text-lg">
+                  {m.client_form_tab_primary()}
+                </CardTitle>
+                <CardDescription className="hidden sm:block">
+                  {m.client_form_description()}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                <div className="grid gap-4 sm:grid-cols-2">
+              <CardContent className="flex flex-col gap-3 sm:gap-4 px-4 sm:px-6">
+                <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+                  <InputElement
+                    control={form.control}
+                    name="primaryInsured.name"
+                    label={m.client_form_name()}
+                    placeholder={m.client_form_name_placeholder()}
+                    required
+                  />
+                  <InputElement
+                    control={form.control}
+                    name="primaryInsured.address"
+                    label={m.client_form_address()}
+                    placeholder={m.client_form_address_placeholder()}
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                   <InputElement
                     control={form.control}
                     name="primaryInsured.ssn"
@@ -295,7 +324,7 @@ export function ClientForm() {
                   />
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                   <SelectElement
                     control={form.control}
                     name="primaryInsured.maritalStatus"
@@ -323,7 +352,7 @@ export function ClientForm() {
                   />
                 )}
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                   <InputElement
                     control={form.control}
                     name="primaryInsured.emailAddress"
@@ -352,7 +381,7 @@ export function ClientForm() {
                   required
                 />
                 {showEmployerFields && (
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                     <InputElement
                       control={form.control}
                       name="primaryInsured.employerName"
@@ -378,7 +407,7 @@ export function ClientForm() {
                   label={m.client_form_citizen()}
                 />
                 {!citizen && (
-                  <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
                     <InputElement
                       control={form.control}
                       name="primaryInsured.visaType"
@@ -411,17 +440,28 @@ export function ClientForm() {
 
           {/* ─── Health Statement ─── */}
           <TabsContent value="health">
-            <Card>
-              <CardHeader>
-                <CardTitle>{m.client_form_tab_health()}</CardTitle>
-                <CardDescription>{m.client_form_description()}</CardDescription>
+            <Card className="py-4 sm:py-6">
+              <CardHeader className="px-4 sm:px-6">
+                <CardTitle className="text-base sm:text-lg">
+                  {m.client_form_tab_health()}
+                </CardTitle>
+                <CardDescription className="hidden sm:block">
+                  {m.client_form_description()}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                <div className="grid gap-4 sm:grid-cols-2">
+              <CardContent className="flex flex-col gap-3 sm:gap-4 px-4 sm:px-6">
+                <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
                   <InputElement
                     control={form.control}
-                    name="healthStatement.height"
+                    name="healthStatement.height.feet"
                     label={m.client_form_height()}
+                    type="number"
+                    required
+                  />
+                  <InputElement
+                    control={form.control}
+                    name="healthStatement.height.inches"
+                    label={m.client_form_height_inches()}
                     type="number"
                     required
                   />
@@ -459,12 +499,16 @@ export function ClientForm() {
 
           {/* ─── Beneficiaries ─── */}
           <TabsContent value="beneficiaries">
-            <Card>
-              <CardHeader>
-                <CardTitle>{m.client_form_tab_beneficiaries()}</CardTitle>
-                <CardDescription>{m.client_form_description()}</CardDescription>
+            <Card className="py-4 sm:py-6">
+              <CardHeader className="px-4 sm:px-6">
+                <CardTitle className="text-base sm:text-lg">
+                  {m.client_form_tab_beneficiaries()}
+                </CardTitle>
+                <CardDescription className="hidden sm:block">
+                  {m.client_form_description()}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col gap-4">
+              <CardContent className="flex flex-col gap-3 sm:gap-4 px-4 sm:px-6">
                 {beneficiariesFieldArray.fields.length > 0 && (
                   <div
                     className={
@@ -487,7 +531,7 @@ export function ClientForm() {
                 {beneficiariesFieldArray.fields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="rounded-md border border-border p-4 flex flex-col gap-4"
+                    className="rounded-md border border-border p-3 sm:p-4 flex flex-col gap-3 sm:gap-4"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">#{index + 1}</span>
@@ -510,7 +554,7 @@ export function ClientForm() {
                       placeholder={m.client_form_beneficiary_relation()}
                       required
                     />
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                       <InputElement
                         control={form.control}
                         name={`beneficiaries.${index}.name`}
@@ -541,7 +585,7 @@ export function ClientForm() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-fit"
+                  className="w-full sm:w-fit"
                   onClick={() => {
                     beneficiariesFieldArray.append({
                       relation: "Child",
@@ -560,12 +604,16 @@ export function ClientForm() {
 
           {/* ─── Financial Information ─── */}
           <TabsContent value="financial">
-            <Card>
-              <CardHeader>
-                <CardTitle>{m.client_form_tab_financial()}</CardTitle>
-                <CardDescription>{m.client_form_description()}</CardDescription>
+            <Card className="py-4 sm:py-6">
+              <CardHeader className="px-4 sm:px-6">
+                <CardTitle className="text-base sm:text-lg">
+                  {m.client_form_tab_financial()}
+                </CardTitle>
+                <CardDescription className="hidden sm:block">
+                  {m.client_form_description()}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col gap-4">
+              <CardContent className="flex flex-col gap-3 sm:gap-4 px-4 sm:px-6">
                 <InputElement
                   control={form.control}
                   name="financialInformation.annualGrossIncome"
