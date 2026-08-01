@@ -36,8 +36,8 @@ export function AppSideBar() {
   const [confirmLogout, setConfirmLogout] = useState(false);
 
   const handleLogout = async () => {
-    await logoutFn();
     clearSessionCache();
+    await logoutFn();
     navigate({ to: "/public/login" });
   };
 

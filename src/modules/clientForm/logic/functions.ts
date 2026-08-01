@@ -15,7 +15,9 @@ export function formatClientFormData(data: ClientFormSchema): string {
 	lines.push("═══════════════════════════════════════");
 	lines.push("  PRIMARY INSURED INFORMATION");
 	lines.push("");
-	lines.push(`  SSN                        : ${data.primaryInsured.ssn}`);
+	lines.push(`  Name                         : ${data.primaryInsured.name}`);
+	lines.push(`  Address                      : ${data.primaryInsured.address}`);
+	lines.push(`  SSN                          : ${data.primaryInsured.ssn}`);
 	lines.push(
 		`  Driver's License State      : ${data.primaryInsured.driversLicenseIssueState}`,
 	);
@@ -71,8 +73,9 @@ export function formatClientFormData(data: ClientFormSchema): string {
 	lines.push("═══════════════════════════════════════");
 	lines.push("  HEALTH STATEMENT");
 	lines.push("");
-	lines.push(`  Height (cm)                 : ${data.healthStatement.height}`);
-	lines.push(`  Weight (kg)                 : ${data.healthStatement.weight}`);
+	const { feet, inches } = data.healthStatement.height;
+	lines.push(`  Height (ft/in)              : ${feet}' ${inches}"`);
+	lines.push(`  Weight (lb)                 : ${data.healthStatement.weight}`);
 	lines.push(
 		`  Primary Physician           : ${data.healthStatement.primaryPhysician ? yes : no}`,
 	);

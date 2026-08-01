@@ -28,7 +28,8 @@ export const Route = createRootRoute({
     const session = await getCachedSession();
     const isAuthPath =
       location.pathname === "/public/login" ||
-      location.pathname === "/public/register";
+      location.pathname === "/public/register" ||
+      location.pathname === "/public/clientForm";
 
     if (!session && !isAuthPath) {
       throw redirect({

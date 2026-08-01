@@ -23,7 +23,7 @@ export function PageContainer({
   const canGoBack = useCanGoBack();
   const router = useRouter();
   return (
-    <div className={cn("container p-4", className)}>
+    <div className={cn("container p-3 sm:p-4", className)}>
       <div className="mb-4 flex flex-col gap-2">
         {breadcrumbs && <div className="mb-2">{breadcrumbs}</div>}
         <>

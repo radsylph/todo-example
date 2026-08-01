@@ -94,6 +94,8 @@ export const beneficiaryRelation = [
 // ─── Sub-schemas ───
 
 export const primaryInsuredSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  address: z.string().min(1, "Address is required"),
   ssn: z.string().min(1, "SSN is required"),
   driversLicenseIssueState: z.enum([...usStates, "none"]),
   maritalStatus: z.enum(maritalStatus),
@@ -111,7 +113,10 @@ export const primaryInsuredSchema = z.object({
 });
 
 export const healthStatementSchema = z.object({
-  height: z.number(),
+  height: z.object({
+    feet: z.number(),
+    inches: z.number(),
+  }),
   weight: z.number(),
   primaryPhysician: z.boolean(),
   primaryPhysicianInfomation: z.string(),
