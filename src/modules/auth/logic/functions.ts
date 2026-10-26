@@ -80,7 +80,7 @@ export const logoutFn = createServerFn({ method: "POST" }).handler(async () => {
 });
 
 export const signUpEmailFn = createServerFn({ method: "POST" })
-  .inputValidator(
+  .validator(
     z.object({
       email: z.email(),
       password: z.string().min(6),
@@ -98,7 +98,7 @@ export const signUpEmailFn = createServerFn({ method: "POST" })
   });
 
 export const signInEmailFn = createServerFn({ method: "POST" })
-  .inputValidator(
+  .validator(
     z.object({
       email: z.email(),
       password: z.string().min(6),

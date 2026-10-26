@@ -30,7 +30,7 @@ import {
 } from "#components/ui/card";
 import { Form } from "#components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#components/ui/tabs";
-import { formatClientFormData, submitClientForm } from "../logic/functions";
+import { generateClientFormPdf } from "../logic/functions";
 import {
   beneficiaryRelation,
   clientFormSchema,
@@ -136,10 +136,10 @@ const beneficiaryRelationOptions = beneficiaryRelation.map((value) => ({
 
 const defaultValues: ClientFormSchema = {
   primaryInsured: {
-    name: "",
-    address: "",
+    fullName: "",
     ssn: "",
     driversLicenseIssueState: "none",
+    driversLicenseNumber: "",
     maritalStatus: "single",
     stateOfBirth: "other",
     birthPlace: "",
@@ -154,10 +154,12 @@ const defaultValues: ClientFormSchema = {
     timeInUS: 0,
   },
   healthStatement: {
-    height: { feet: 5, inches: 7 },
-    weight: 154,
+    height: 0,
+    weight: 0,
     primaryPhysician: false,
     primaryPhysicianInfomation: "",
+    hasPrescriptionMedicine: false,
+    prescriptionMedicine: "",
     lastConsult: "",
   },
   beneficiaries: [],
@@ -173,6 +175,42 @@ interface TabsProps {
   value: string;
   icon: React.ReactNode;
   label: string;
+}
+
+/**
+ * Flattens react-hook-form's nested error object into a list of
+ * { path, message } entries so they can be rendered in a single summary.
+ */
+function flattenErrors(
+	errors: Record<string, unknown>,
+	path = "",
+): Array<{ path: string; message: string }> {
+	const entries: Array<{ path: string; message: string }> = [];
+
+	for (const [key, value] of Object.entries(errors)) {
+		if (!value) continue;
+		const currentPath = path ? `${path}.${key}` : key;
+
+		if (Array.isArray(value)) {
+			value.forEach((item, index) => {
+				if (item && typeof item === "object" && !("message" in item)) {
+					entries.push(...flattenErrors(item as Record<string, unknown>, `${currentPath}[${index}]`));
+				}
+			});
+			const root = (value as { root?: { message?: string } }).root;
+			if (root?.message) {
+				entries.push({ path: currentPath, message: root.message });
+			}
+		} else if (typeof value === "object") {
+			if ("message" in (value as object) && typeof (value as { message?: string }).message === "string") {
+				entries.push({ path: currentPath, message: (value as { message: string }).message });
+			} else {
+				entries.push(...flattenErrors(value as Record<string, unknown>, currentPath));
+			}
+		}
+	}
+
+	return entries;
 }
 
 function TabsForm({ value, icon, label }: TabsProps) {
@@ -237,38 +275,54 @@ export function ClientForm() {
     control: form.control,
     name: "beneficiaries",
   });
+  const driversLicenseIssueState = useWatch({
+    control: form.control,
+    name: "primaryInsured.driversLicenseIssueState",
+  });
+  const hasPrescriptionMedicine = useWatch({
+    control: form.control,
+    name: "healthStatement.hasPrescriptionMedicine",
+  });
   const showEmployerFields =
     employerStatusValue !== "disabled" && employerStatusValue !== "retired";
+  const showDriversLicenseNumber = driversLicenseIssueState !== "none";
   const totalPercent = (beneficiaries ?? []).reduce(
     (sum, b) => sum + (Number(b?.percent) || 0),
     0,
   );
 
   const onSubmit = async (data: ClientFormSchema) => {
-    console.log("submitting");
     setLoading(true);
     try {
-      const formatted = await submitClientForm(data);
-      console.log("client form data\n", formatted);
+      generateClientFormPdf(data);
       toast.success(m.client_form_saved_success());
     } catch (err) {
-      // fallback: log to console if clipboard API fails
-      console.log("client form data\n", formatClientFormData(data));
-      toast.success(m.client_form_saved_success());
-      console.error("clipboard copy failed", err);
+      console.error("Failed to generate client form PDF", err);
+      toast.error(m.client_form_pdf_error());
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
+
+  const formErrors = flattenErrors(form.formState.errors);
 
   return (
     <Form {...form}>
       <FormLayout onSubmit={onSubmit} isSubmitting={loading}>
-        <Tabs
-          defaultValue="primary"
-          orientation={isMobile ? "vertical" : "horizontal"}
-          className="w-full flex-col"
-        >
-          <TabsList className="w-full">
+        {form.formState.isSubmitted && formErrors.length > 0 && (
+          <div className="rounded-md border border-rose-200 bg-rose-50 p-4 dark:border-rose-900 dark:bg-rose-950">
+            <p className="text-sm font-medium text-rose-700 dark:text-rose-300">
+              {m.client_form_errors_summary()}
+            </p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-rose-600 dark:text-rose-400">
+              {formErrors.map((err, index) => (
+                <li key={`${err.path}-${index}`}>{err.message}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <Tabs defaultValue="primary" className="w-full">
+          <TabsList className="w-full" variant="default">
             {tabs.map((tab) => (
               <TabsForm key={tab.value} {...tab} />
             ))}
@@ -285,25 +339,15 @@ export function ClientForm() {
                   {m.client_form_description()}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col gap-3 sm:gap-4 px-4 sm:px-6">
-                <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
-                  <InputElement
-                    control={form.control}
-                    name="primaryInsured.name"
-                    label={m.client_form_name()}
-                    placeholder={m.client_form_name_placeholder()}
-                    required
-                  />
-                  <InputElement
-                    control={form.control}
-                    name="primaryInsured.address"
-                    label={m.client_form_address()}
-                    placeholder={m.client_form_address_placeholder()}
-                    required
-                  />
-                </div>
-
-                <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+              <CardContent className="flex flex-col gap-4">
+                <InputElement
+                  control={form.control}
+                  name="primaryInsured.fullName"
+                  label={m.client_form_full_name()}
+                  placeholder={m.client_form_full_name_placeholder()}
+                  required
+                />
+                <div className="grid gap-4 sm:grid-cols-2">
                   <InputElement
                     control={form.control}
                     name="primaryInsured.ssn"
@@ -323,6 +367,15 @@ export function ClientForm() {
                     required
                   />
                 </div>
+                {showDriversLicenseNumber && (
+                  <InputElement
+                    control={form.control}
+                    name="primaryInsured.driversLicenseNumber"
+                    label={m.client_form_drivers_license_number()}
+                    placeholder={m.client_form_drivers_license_number_placeholder()}
+                    required
+                  />
+                )}
 
                 <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                   <SelectElement
@@ -486,7 +539,21 @@ export function ClientForm() {
                     placeholder={m.client_form_primary_physician_information_placeholder()}
                   />
                 )}
-                <InputElement
+                <SwitchElement
+                  control={form.control}
+                  name="healthStatement.hasPrescriptionMedicine"
+                  label={m.client_form_has_prescription_medicine()}
+                />
+                {hasPrescriptionMedicine && (
+                  <TextAreaElement
+                    control={form.control}
+                    name="healthStatement.prescriptionMedicine"
+                    label={m.client_form_prescription_medicine()}
+                    placeholder={m.client_form_prescription_medicine_placeholder()}
+                    required
+                  />
+                )}
+                <TextAreaElement
                   control={form.control}
                   name="healthStatement.lastConsult"
                   label={m.client_form_last_consult()}
@@ -525,6 +592,11 @@ export function ClientForm() {
                 {beneficiariesFieldArray.fields.length === 0 && (
                   <p className="text-sm text-muted-foreground">
                     {m.client_form_tab_beneficiaries()}
+                  </p>
+                )}
+                {form.formState.errors.beneficiaries?.root && (
+                  <p className="text-sm font-medium text-rose-600 dark:text-rose-400">
+                    {form.formState.errors.beneficiaries.root.message}
                   </p>
                 )}
 

@@ -94,15 +94,15 @@ export const beneficiaryRelation = [
 // ─── Sub-schemas ───
 
 export const primaryInsuredSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  address: z.string().min(1, "Address is required"),
-  ssn: z.string().min(1, "SSN is required"),
+  fullName: z.string().min(1, m.client_form_validation_full_name_required()),
+  ssn: z.string().min(1, m.client_form_validation_ssn_required()),
   driversLicenseIssueState: z.enum([...usStates, "none"]),
+  driversLicenseNumber: z.string(),
   maritalStatus: z.enum(maritalStatus),
   stateOfBirth: z.enum([...usStates, "other"]),
   birthPlace: z.string(),
-  emailAddress: z.email(),
-  cellphoneNumber: z.string().min(1, "Phone is required"),
+  emailAddress: z.email(m.client_form_validation_email_invalid()),
+  cellphoneNumber: z.string().min(1, m.client_form_validation_phone_required()),
   employerStatus: z.enum(employerStatus),
   employerName: z.string(),
   occupationAndDuties: z.string(),
@@ -120,13 +120,15 @@ export const healthStatementSchema = z.object({
   weight: z.number(),
   primaryPhysician: z.boolean(),
   primaryPhysicianInfomation: z.string(),
-  lastConsult: z.string(),
+  hasPrescriptionMedicine: z.boolean(),
+  prescriptionMedicine: z.string(),
+  lastConsult: z.string().min(1, m.client_form_validation_last_consult_required()),
 });
 
 export const beneficiarySchema = z.object({
   relation: z.enum(beneficiaryRelation),
-  name: z.string(),
-  birthDay: z.string(),
+  name: z.string().min(1, m.client_form_validation_beneficiary_name_required()),
+  birthDay: z.string().min(1, m.client_form_validation_beneficiary_birth_day_required()),
   percent: z.number(),
 });
 
@@ -151,12 +153,24 @@ export const clientFormSchema = z
     const insured = data.primaryInsured;
     console.log("test");
 
+    // Driver's license number required only when a state was selected
+    if (
+      insured.driversLicenseIssueState !== "none" &&
+      !insured.driversLicenseNumber.trim()
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["primaryInsured", "driversLicenseNumber"],
+        message: m.client_form_validation_drivers_license_number_required(),
+      });
+    }
+
     // Birth place required only when stateOfBirth is "other"
     if (insured.stateOfBirth === "other" && !insured.birthPlace.trim()) {
       ctx.addIssue({
         code: "custom",
         path: ["primaryInsured", "birthPlace"],
-        message: "Birth place is required",
+        message: m.client_form_validation_birth_place_required(),
       });
     }
 
@@ -202,8 +216,26 @@ export const clientFormSchema = z
         });
       }
     }
-    // Beneficiary percentages must sum to 100 when any exist
-    if (data.beneficiaries.length > 0) {
+    // Prescription medicine required when flag is true
+    if (
+      data.healthStatement.hasPrescriptionMedicine &&
+      !data.healthStatement.prescriptionMedicine.trim()
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["healthStatement", "prescriptionMedicine"],
+        message: m.client_form_validation_prescription_medicine_required(),
+      });
+    }
+
+    // At least one beneficiary is required and percentages must sum to 100
+    if (data.beneficiaries.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["beneficiaries", "root"],
+        message: m.client_form_validation_beneficiary_required(),
+      });
+    } else {
       const total = data.beneficiaries.reduce(
         (sum, b) => sum + (Number(b.percent) || 0),
         0,

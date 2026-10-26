@@ -16,14 +16,14 @@ import {
 import { z } from "zod";
 
 export const getTasksFn = createServerFn({ method: "GET" })
-  .inputValidator(taskQueryOptionsSchema)
+  .validator(taskQueryOptionsSchema)
   .handler(async ({ data }) => {
     const response = await getTasks(data);
     return taskPaginationResponseSchema.parse(response);
   });
 
 export const getTaskByIdFn = createServerFn({ method: "GET" })
-  .inputValidator(z.object({ taskId: z.string() }))
+  .validator(z.object({ taskId: z.string() }))
   .handler(async ({ data }) => {
     const test = z.uuid().safeParse(data.taskId);
     if (test.success) {
@@ -34,13 +34,13 @@ export const getTaskByIdFn = createServerFn({ method: "GET" })
   });
 
 export const createTaskFn = createServerFn({ method: "POST" })
-  .inputValidator(createTaskSchema)
+  .validator(createTaskSchema)
   .handler(async ({ data }) => {
     return await createTask(data);
   });
 
 export const updateTaskFn = createServerFn({ method: "POST" })
-  .inputValidator(updateTaskSchema)
+  .validator(updateTaskSchema)
   .handler(async ({ data }) => {
     const test = updateTaskSchema.safeParse(data);
     if(test.success){
@@ -50,7 +50,7 @@ export const updateTaskFn = createServerFn({ method: "POST" })
   });
 
 export const deleteTaskFn = createServerFn({ method: "GET" })
-  .inputValidator(z.object({ taskId: z.string() }))
+  .validator(z.object({ taskId: z.string() }))
   .handler(async ({ data }) => {
     const test = z.uuid().safeParse(data.taskId);
     if(test.success){
