@@ -1,133 +1,161 @@
+import { jsPDF } from "jspdf";
 import type { ClientFormSchema } from "../types";
 
-/**
- * Formats the entire client form payload into a readable structured block
- * of text intended for clipboard pasting (email, notes, etc.).
- */
-export function formatClientFormData(data: ClientFormSchema): string {
-	const yes = "✅ Yes";
-	const no = "❌ No";
-	const na = "—";
+const yes = "Sí";
+const no = "No";
+const na = "—";
 
-	const lines: string[] = [];
+/**
+ * Builds a filename from the client's full name and the current timestamp.
+ * Non-alphanumeric characters are stripped so the name is filesystem-safe.
+ */
+function buildPdfFilename(fullName: string): string {
+	const safeName = fullName.trim().replace(/[^a-z0-9]+/gi, "-");
+	return `formulario-cliente-${safeName}-${Date.now()}.pdf`;
+}
+
+/**
+ * Generates a one-page PDF summary of the client form and triggers a browser
+ * download. This runs entirely client-side.
+ *
+ * NOTE: Content is hardcoded in Spanish by request. Make this dynamic when the
+ * PDF language needs to follow the active Paraglide locale.
+ */
+export function generateClientFormPdf(data: ClientFormSchema): void {
+	const doc = new jsPDF();
+	const left = 14;
+	const lineHeight = 7;
+	let y = 20;
+
+	const ensurePageBreak = (needed = lineHeight) => {
+		if (y + needed > 280) {
+			doc.addPage();
+			y = 20;
+		}
+	};
+
+	const addHeading = (text: string) => {
+		ensurePageBreak(lineHeight * 2);
+		doc.setFont("helvetica", "bold");
+		doc.setFontSize(14);
+		doc.text(text, left, y);
+		doc.setFont("helvetica", "normal");
+		doc.setFontSize(11);
+		y += lineHeight * 1.5;
+	};
+
+	const addLabelValue = (label: string, value: string) => {
+		ensurePageBreak();
+		doc.text(`${label}: ${value}`, left, y);
+		y += lineHeight;
+	};
+
+	// ─── Title ───
+	doc.setFont("helvetica", "bold");
+	doc.setFontSize(20);
+	doc.text("Resumen del Formulario de Cliente", left, y);
+	doc.setFont("helvetica", "normal");
+	doc.setFontSize(10);
+	y += lineHeight * 1.5;
+	doc.text(`Generado: ${new Date().toLocaleString()}`, left, y);
+	doc.setFontSize(11);
+	y += lineHeight * 1.5;
 
 	// ─── Primary Insured ───
-	lines.push("═══════════════════════════════════════");
-	lines.push("  PRIMARY INSURED INFORMATION");
-	lines.push("");
-	lines.push(`  Name                         : ${data.primaryInsured.name}`);
-	lines.push(`  Address                      : ${data.primaryInsured.address}`);
-	lines.push(`  SSN                          : ${data.primaryInsured.ssn}`);
-	lines.push(
-		`  Driver's License State      : ${data.primaryInsured.driversLicenseIssueState}`,
+	addHeading("Asegurado Principal");
+	addLabelValue("Nombre Completo", data.primaryInsured.fullName);
+	addLabelValue("SSN", data.primaryInsured.ssn);
+	addLabelValue(
+		"Estado de Emisión de Licencia",
+		data.primaryInsured.driversLicenseIssueState,
 	);
-	lines.push(
-		`  Marital Status              : ${data.primaryInsured.maritalStatus}`,
-	);
-	lines.push(
-		`  State of Birth              : ${data.primaryInsured.stateOfBirth}`,
-	);
-	lines.push(
-		`  Birth Place                 : ${data.primaryInsured.birthPlace}`,
-	);
-	lines.push(
-		`  Email                       : ${data.primaryInsured.emailAddress}`,
-	);
-	lines.push(
-		`  Cellphone                   : ${data.primaryInsured.cellphoneNumber}`,
-	);
-	lines.push(
-		`  Employer Status             : ${data.primaryInsured.employerStatus}`,
-	);
-
+	if (data.primaryInsured.driversLicenseIssueState !== "none") {
+		addLabelValue(
+			"Número de Licencia",
+			data.primaryInsured.driversLicenseNumber,
+		);
+	}
+	addLabelValue("Estado Civil", data.primaryInsured.maritalStatus);
+	addLabelValue("Estado de Nacimiento", data.primaryInsured.stateOfBirth);
+	if (data.primaryInsured.stateOfBirth === "other") {
+		addLabelValue("Lugar de Nacimiento", data.primaryInsured.birthPlace);
+	}
+	addLabelValue("Correo Electrónico", data.primaryInsured.emailAddress);
+	addLabelValue("Número de Celular", data.primaryInsured.cellphoneNumber);
+	addLabelValue("Situación Laboral", data.primaryInsured.employerStatus);
 	if (
 		data.primaryInsured.employerStatus !== "disabled" &&
 		data.primaryInsured.employerStatus !== "retired"
 	) {
-		lines.push(
-			`  Employer Name               : ${data.primaryInsured.employerName}`,
-		);
-		lines.push(
-			`  Occupation & Duties          : ${data.primaryInsured.occupationAndDuties}`,
+		addLabelValue("Nombre del Empleador", data.primaryInsured.employerName);
+		addLabelValue(
+			"Ocupación y Funciones",
+			data.primaryInsured.occupationAndDuties,
 		);
 	}
-
-	lines.push(
-		`  US Citizen                  : ${data.primaryInsured.citizen ? yes : no}`,
-	);
-
+	addLabelValue("Ciudadano Estadounidense", data.primaryInsured.citizen ? yes : no);
 	if (!data.primaryInsured.citizen) {
-		lines.push(
-			`  Visa Type                   : ${data.primaryInsured.visaType || na}`,
+		addLabelValue("Tipo de Visa", data.primaryInsured.visaType || na);
+		addLabelValue(
+			"Número de Visa",
+			String(data.primaryInsured.visaNumber || na),
 		);
-		lines.push(
-			`  Visa Number                 : ${data.primaryInsured.visaNumber || na}`,
-		);
-		lines.push(
-			`  Time in US (years)          : ${data.primaryInsured.timeInUS || na}`,
+		addLabelValue(
+			"Tiempo en EE.UU. (años)",
+			String(data.primaryInsured.timeInUS || na),
 		);
 	}
 
 	// ─── Health Statement ───
-	lines.push("");
-	lines.push("═══════════════════════════════════════");
-	lines.push("  HEALTH STATEMENT");
-	lines.push("");
-	const { feet, inches } = data.healthStatement.height;
-	lines.push(`  Height (ft/in)              : ${feet}' ${inches}"`);
-	lines.push(`  Weight (lb)                 : ${data.healthStatement.weight}`);
-	lines.push(
-		`  Primary Physician           : ${data.healthStatement.primaryPhysician ? yes : no}`,
+	y += lineHeight;
+	addHeading("Declaración de Salud");
+	addLabelValue("Altura (cm)", String(data.healthStatement.height));
+	addLabelValue("Peso (kg)", String(data.healthStatement.weight));
+	addLabelValue(
+		"Médico de Cabecera",
+		data.healthStatement.primaryPhysician ? yes : no,
 	);
 	if (data.healthStatement.primaryPhysician) {
-		lines.push(
-			`  Physician Information       : ${data.healthStatement.primaryPhysicianInfomation}`,
+		addLabelValue(
+			"Información del Médico",
+			data.healthStatement.primaryPhysicianInfomation,
 		);
 	}
-	lines.push(
-		`  Last Consultation           : ${data.healthStatement.lastConsult}`,
+	addLabelValue(
+		"Tiene Medicamentos Recetados",
+		data.healthStatement.hasPrescriptionMedicine ? yes : no,
 	);
+	if (data.healthStatement.hasPrescriptionMedicine) {
+		addLabelValue(
+			"Medicamentos Recetados",
+			data.healthStatement.prescriptionMedicine,
+		);
+	}
+	addLabelValue("Última Consulta", data.healthStatement.lastConsult);
 
 	// ─── Beneficiaries ───
-	lines.push("");
-	lines.push("═══════════════════════════════════════");
-	lines.push("  BENEFICIARIES");
+	y += lineHeight;
+	addHeading("Beneficiarios");
 	if (data.beneficiaries.length === 0) {
-		lines.push(`  (none)`);
+		ensurePageBreak();
+		doc.text("Ninguno", left, y);
+		y += lineHeight;
 	} else {
-		lines.push("");
 		data.beneficiaries.forEach((b, i) => {
-			lines.push(`  ${i + 1}. ${b.name} — ${b.relation} — ${b.percent}%`);
+			ensurePageBreak();
+			doc.text(`${i + 1}. ${b.name} - ${b.relation} - ${b.percent}%`, left, y);
+			y += lineHeight;
 		});
 	}
 
 	// ─── Financial Information ───
-	lines.push("");
-	lines.push("═══════════════════════════════════════");
-	lines.push("  FINANCIAL INFORMATION");
-	lines.push("");
-	lines.push(
-		`  Annual Gross Income         : $${data.financialInformation.annualGrossIncome.toLocaleString()}`,
+	y += lineHeight;
+	addHeading("Información Financiera");
+	addLabelValue(
+		"Ingreso Bruto Anual",
+		`$${data.financialInformation.annualGrossIncome.toLocaleString()}`,
 	);
-	lines.push(
-		`  Bankruptcy                  : ${data.financialInformation.bankruptcy ? yes : no}`,
-	);
+	addLabelValue("Bancarrota", data.financialInformation.bankruptcy ? yes : no);
 
-	lines.push("");
-	lines.push("═══════════════════════════════════════");
-
-	return lines.join("\n");
-}
-
-/**
- * Submits the client form by copying a structured summary to the clipboard.
- *
- * @returns The plain-text formatted summary.
- */
-export async function submitClientForm(
-	data: ClientFormSchema,
-): Promise<string> {
-	const formatted = formatClientFormData(data);
-	await navigator.clipboard.writeText(formatted);
-	return formatted;
+	doc.save(buildPdfFilename(data.primaryInsured.fullName));
 }
