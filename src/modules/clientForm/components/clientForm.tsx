@@ -10,7 +10,6 @@ import {
 import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
-import { useIsMobile } from "#modules/common/hooks/useMobile.ts";
 import { m } from "#/paraglide/messages";
 import { InputElement } from "#components/forms/inputElement.tsx";
 import {
@@ -154,7 +153,10 @@ const defaultValues: ClientFormSchema = {
     timeInUS: 0,
   },
   healthStatement: {
-    height: 0,
+    height: {
+      feet: 0,
+      inches: 0,
+    },
     weight: 0,
     primaryPhysician: false,
     primaryPhysicianInfomation: "",
@@ -227,7 +229,6 @@ function TabsForm({ value, icon, label }: TabsProps) {
 
 export function ClientForm() {
   const [loading, setLoading] = useState(false);
-  const isMobile = useIsMobile();
 
   const tabs = [
     {
